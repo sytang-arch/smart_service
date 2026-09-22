@@ -42,6 +42,9 @@ function loadEnv() {
 loadEnv();
 
 const PORT = Number(process.env.PORT || 8787);
+/* 默认只监听回环地址，避免把本地服务暴露到局域网。
+   确实需要用手机等设备访问时，再设 HOST=0.0.0.0。 */
+const HOST = process.env.HOST || "127.0.0.1";
 const DIFY_API_BASE = (process.env.DIFY_API_BASE || "https://api.dify.ai/v1").replace(/\/+$/, "");
 const DIFY_API_KEY = process.env.DIFY_API_KEY || "";
 const APP_NAME = process.env.DIFY_APP_NAME || "云栖智能客服 Agent";
@@ -225,13 +228,13 @@ const server = http.createServer((req, res) => {
   return serveStatic(req, res);
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, HOST, () => {
   const line = "=".repeat(62);
   console.log(line);
   console.log("  云栖数码 · 智能客服 Demo 已启动");
   console.log(line);
-  console.log("  页面地址   : http://localhost:" + PORT);
-  console.log("  静态接口   : http://localhost:" + PORT + "/api/orders/by-customer/C1001.json");
+  console.log("  页面地址   : http://" + HOST + ":" + PORT);
+  console.log("  静态接口   : http://" + HOST + ":" + PORT + "/api/orders/by-customer/C1001.json");
   console.log("  Dify 接入  : " + (DIFY_API_KEY ? "已配置（" + DIFY_API_BASE + "）" : "未配置 —— 页面将进入规则兜底模式"));
   console.log("  身份注入   : " + IDENTITY_MODE);
   console.log(line);
