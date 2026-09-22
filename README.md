@@ -3,10 +3,27 @@
 一个用 **Dify Chatflow** 搭的电商智能客服 Agent，配一个自己写的客服工作台前端。
 它按**当前登录客户身份**查订单、跟物流、处理售后，并把 AI 对话嵌进自建页面里。
 
-> 在线体验：`https://sytang-arch.github.io/smart_service/`
-> （页面打开即可浏览订单与售后流程；AI 对话需要连接 Dify，见下方「快速开始」）
+> **在线体验：<https://sytang-arch.github.io/smart_service/>**
+> 点开即用，无需登录、无需安装。页面顶部有「体验指引」按钮，访问者可自己走完全流程。
+> 对话区有三条通道，页面会**自动选当前可用且最好的一条**（见下方「对话通道」）。
 
 **这个 Demo 想证明的不是"能接上大模型"，而是"知道该在哪儿给大模型上锁"。**
+
+---
+
+## 对话通道（三选一，自适应）
+
+| 通道 | 触发条件 | 体验 | 身份注入 |
+| --- | --- | --- | --- |
+| **工作台对话**（首选） | 配了 `API_BASE` 且代理在线 | 自建 UI，SSE 流式，样式统一 | ✅ 服务端注入 `customer_id`，Agent 不会认错人 |
+| **Dify 原生对话** | 配了 `DIFY_WEBAPP_URL` | iframe 内嵌 Dify 官方 WebApp | ❌ iframe 拿不到登录态，需手动说明身份 |
+| **规则兜底** | 两条都没配 | 前端规则引擎，页面明确标注模式 | —— |
+
+页面加载时会探测 `/api/health`：**能连上代理就走首选通道；连不上但配了 WebApp 地址就自动切到 iframe**，
+两条都不满足才落到规则兜底。切换标签只在配了 `DIFY_WEBAPP_URL` 时出现。
+
+这样设计的原因：链接发给别人（面试官、HR）时，你无法控制对方的环境。
+**任何情况下点开都要有反应**，但不能让对方误以为"这就是 AI Agent 的水平"——所以每条通道都会在界面上标明自己是谁。
 
 ---
 
@@ -81,12 +98,17 @@ node server/index.js
 
 ### 方式三：部署成可分享的链接
 
-| 部分 | 部署方式 |
-| --- | --- |
-| 前端 + 静态数据 | GitHub Pages（仓库 Settings → Pages → 选 main / root） |
-| 对话代理 | Cloudflare Worker，见 [`server/wrangler.toml.example`](server/wrangler.toml.example) |
+| 部分 | 部署方式 | 效果 |
+| --- | --- | --- |
+| 前端 + 静态数据 | GitHub Pages（Settings → Pages → main / root） | 页面与静态 API 上线 |
+| 对话：零部署方案 | 在 `config.js` 填 `DIFY_WEBAPP_URL`（Dify 应用 → 概览 → WebApp 链接） | 真 Agent，但是官方 UI，且不注入身份 |
+| 对话：完整体验 | 部署对话代理（Cloudflare Worker，见 [`server/wrangler.toml.example`](server/wrangler.toml.example)），把地址填进 `API_BASE` | 自建 UI + 真 Agent + 身份注入 |
 
-部署完把代理地址填进 [`assets/js/config.js`](assets/js/config.js) 的 `API_BASE` 即可。
+**只想尽快发链接**：Pages 上线 + 填 `DIFY_WEBAPP_URL`，10 分钟内可完成，不需要服务器。
+**想展示架构能力**：再加一个 Worker 代理，把 `API_BASE` 指过去，这样"Key 不进前端"这条设计才真正成立。
+
+> 部署完记得确认：Dify 应用里点过 **发布**，否则 API 会返回
+> `{"code":"invalid_param","message":"Workflow not published"}`。
 
 ---
 
@@ -162,8 +184,21 @@ python tools/generate_data.py
 | --- | --- | --- |
 | 数据是静态快照，不实时 | GitHub Pages 是静态托管 | 换成真实后端，只改一个 Base URL |
 | 取消/退款不落库 | 静态托管没有写接口 | 把代码节点换成调用真实售后 API 的 HTTP 节点 |
-| 未连接 Dify 时用规则引擎 | 保证分享出去的链接可用 | 部署代理后即为真实 Agent |
+| 公开页没配代理时用规则引擎 | 保证分享出去的链接可用 | 配 `DIFY_WEBAPP_URL` 或部署代理 |
+| iframe 通道拿不到登录身份 | 跨域 iframe 无法共享会话 | 用代理通道，身份由服务端注入 |
 | 没有用户登录鉴权 | Demo 用左侧"切换身份"模拟登录 | 接入真实登录态，`customer_id` 从会话取 |
+
+---
+
+## 排障速查
+
+| 现象 | 原因 | 处理 |
+| --- | --- | --- |
+| 对话返回 `Workflow not published` | Dify 应用只存了草稿，没点发布 | 在 Dify 应用右上角点「发布」 |
+| 页面显示"规则兜底（未连接 Dify）" | `API_BASE` 为空或代理没起 | 启动 `node server/index.js`，或填 Worker 地址 |
+| 页面显示"代理已连，但 Dify Key 未配置" | 代理起来了但 `.env` 没填 Key | 填 `DIFY_API_KEY` 后重启代理 |
+| 代理启动日志提示"未配置" | `.env` 不在项目根目录 | 必须是 `smart_service/.env`，文件名没有前缀 |
+| iframe 一片空白 | Dify 应用未公开 / 浏览器拦截第三方 Cookie | 在 Dify 把应用设为公开；换 Chrome 无痕窗口再试 |
 
 ---
 

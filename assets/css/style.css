@@ -305,6 +305,25 @@ code { font-family: var(--mono); font-size: .92em; background: var(--info-soft);
 }
 .chat-foot .sep { opacity: .5; }
 
+/* ---------------- 对话通道切换（工作台对话 / Dify 原生对话） ---------------- */
+.chat-tabs { display: flex; gap: 6px; padding: 10px 14px 0; }
+.chat-tab {
+  font: inherit; font-size: 12px; padding: 5px 12px; cursor: pointer;
+  border: 1px solid var(--line-strong); background: var(--panel); color: var(--text-2);
+  border-radius: 999px; transition: .14s;
+}
+.chat-tab:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-soft); }
+.chat-tab.is-on { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; }
+
+.chat-embed { flex: 1; min-height: 300px; display: flex; flex-direction: column; }
+.chat-embed .embed-note {
+  margin: 0; padding: 9px 14px; font-size: 11.5px; line-height: 1.62;
+  color: var(--text-2); background: var(--warn-soft); border-bottom: 1px solid #f0e0c0;
+}
+.chat-embed iframe { flex: 1; width: 100%; min-height: 260px; border: none; background: var(--panel-2); }
+.chat-embed[hidden] { display: none; }
+.chat-body[hidden], .chat-quick[hidden], .chat-input[hidden] { display: none; }
+
 /* ---------------- 页脚 ---------------- */
 .footer {
   padding: 14px 20px 26px; font-size: 11.5px; color: var(--text-3);

@@ -13,6 +13,7 @@
   var el = {};
   var state = {
     mode: "unknown",            // "dify" | "offline"
+    channel: "chat",            // "chat"（自建 UI，身份自动注入）| "embed"（Dify 官方 WebApp iframe）
     base: "",                   // 代理基地址（"" = 同源）
     conversationId: "",
     sending: false,
@@ -60,6 +61,66 @@
     }
     if (list) out.push("</" + list + ">");
     return out.join("");
+  }
+
+  /* ---------------- 对话通道切换 ---------------- */
+  /**
+   * 两条通道：
+   *   chat  —— 自建 UI → 代理 → Dify。客户身份由服务端注入，Agent 不会认错人。
+   *   embed —— Dify 官方 WebApp 用 iframe 内嵌。零部署，但 iframe 拿不到当前
+   *            登录客户，身份只能靠用户手动说明（下方会明确提示这一点）。
+   */
+  function setChannel(ch) {
+    var wantEmbed = ch === "embed" && !!cfg.DIFY_WEBAPP_URL;
+    state.channel = wantEmbed ? "embed" : "chat";
+
+    var tabs = document.getElementById("chat-tabs");
+    if (tabs) {
+      var btns = tabs.querySelectorAll(".chat-tab");
+      for (var i = 0; i < btns.length; i++) {
+        var on = btns[i].getAttribute("data-channel") === state.channel;
+        btns[i].classList.toggle("is-on", on);
+        btns[i].setAttribute("aria-pressed", on ? "true" : "false");
+      }
+    }
+
+    var embed = document.getElementById("chat-embed");
+    if (embed) embed.hidden = !wantEmbed;
+    if (el.body) el.body.hidden = wantEmbed;
+
+    ["chat-quick", "chat-form"].forEach(function (id) {
+      var n = document.getElementById(id);
+      if (n) n.hidden = wantEmbed;
+    });
+
+    if (wantEmbed) {
+      loadEmbed();
+      setStatus("Dify 原生对话（iframe 内嵌）", "ok");
+      if (el.modeHint) el.modeHint.textContent = "Dify 官方 WebApp";
+    } else {
+      applyModeHint();
+    }
+  }
+
+  /** iframe 懒加载：只有真的切过去才请求，避免首页白白拉一次 Dify */
+  function loadEmbed() {
+    var f = document.getElementById("chat-embed-frame");
+    if (!f || f.getAttribute("src")) return;
+    f.setAttribute("src", cfg.DIFY_WEBAPP_URL);
+  }
+
+  /** 把探测到的通道状态写回界面（切回工作台对话时复用） */
+  function applyModeHint() {
+    if (state.mode === "dify") {
+      setStatus("Dify Agent 已连接", "ok");
+      if (el.modeHint) el.modeHint.textContent = "Dify Agent" + (state.appName ? " · " + state.appName : "");
+    } else if (state.difyConfigured === true) {
+      setStatus("代理已连，但 Dify Key 未配置", "warn");
+      if (el.modeHint) el.modeHint.textContent = "规则兜底（Dify Key 未配置）";
+    } else {
+      setStatus("规则兜底模式 · 回答由前端规则生成", "warn");
+      if (el.modeHint) el.modeHint.textContent = "规则兜底（未连接 Dify）";
+    }
   }
 
   /* ---------------- DOM ---------------- */
@@ -436,15 +497,10 @@
         .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
         .then(function (j) {
           state.base = base;
-          if (j && j.dify_configured) {
-            state.mode = "dify";
-            setStatus("Dify Agent 已连接", "ok");
-            el.modeHint.textContent = "Dify Agent" + (j.app_name ? " · " + j.app_name : "");
-          } else {
-            state.mode = "offline";
-            setStatus("代理已连，但 Dify Key 未配置", "warn");
-            el.modeHint.textContent = "规则兜底（Dify Key 未配置）";
-          }
+          state.appName = (j && j.app_name) || "";
+          state.difyConfigured = !!(j && j.dify_configured);
+          state.mode = state.difyConfigured ? "dify" : "offline";
+          if (state.channel === "chat") applyModeHint();
           return true;
         })
         .catch(function () { return next(); });
@@ -452,9 +508,9 @@
 
     return next().then(function (ok) {
       if (ok) return;
-      state.mode = cfg.ALLOW_OFFLINE_FALLBACK === false ? "offline" : "offline";
-      setStatus(cfg.ALLOW_OFFLINE_FALLBACK === false ? "未连接 Dify（已禁用兜底）" : "规则兜底模式 · 回答由前端规则生成", "warn");
-      el.modeHint.textContent = "规则兜底（未连接 Dify）";
+      state.mode = "offline";
+      state.difyConfigured = false;
+      if (state.channel === "chat") applyModeHint();
     });
   }
 
@@ -503,14 +559,55 @@
 
     addMsg("ai", "您好，我是" + (cfg.ASSISTANT_NAME || "在线客服") + " 👋\n\n左侧切换客户身份后，我可以帮他查订单、看物流、取消订单、处理退款。\n\n**试一句：「我的订单到哪了？」**");
 
-    return detectMode();
+    setupChannels();
+
+    return detectMode().then(function () {
+      /* 公开托管（GitHub Pages）且没有配代理时，自建通道只能走规则兜底。
+         这时候如果填了 Dify WebApp 地址，就默认切到官方 iframe，
+         让访问者第一眼看到的是真 Agent，而不是规则问答。 */
+      if (state.mode !== "dify" && cfg.DIFY_WEBAPP_URL) {
+        setChannel("embed");
+        addMsg(
+          "ai",
+          "当前页面没有配置对话代理，已自动切到 **Dify 原生对话** 通道（上方标签可随时切回「工作台对话」）。\n\n" +
+          "· 工作台对话：身份由服务端注入，Agent 自动知道当前客户是谁。\n" +
+          "· 原生对话：iframe 拿不到登录状态，需要您手动告诉 Agent 自己是谁。",
+          "通道自动选择"
+        );
+      }
+    });
+  }
+
+  /** 通道入口只有填了 Dify WebApp 地址才出现，否则界面保持原样 */
+  function setupChannels() {
+    var tabs = document.getElementById("chat-tabs");
+    if (!cfg.DIFY_WEBAPP_URL) return;
+
+    if (tabs) {
+      tabs.hidden = false;
+      tabs.addEventListener("click", function (e) {
+        var t = e.target;
+        while (t && t !== tabs && !t.getAttribute("data-channel")) t = t.parentNode;
+        if (t && t !== tabs) setChannel(t.getAttribute("data-channel"));
+      });
+    }
+
+    var note = document.getElementById("embed-note");
+    if (note) {
+      note.textContent =
+        "这是 Dify 官方 WebApp 的原始界面，用于对照「自建 UI + 代理」与「官方 iframe 嵌入」两种集成方式。" +
+        "注意：iframe 拿不到当前登录客户，Agent 不会自动知道您是谁，需要手动说明；" +
+        "「工作台对话」通道由服务端注入 customer_id，Agent 不会认错人。";
+    }
   }
 
   window.CSChat = {
     init: init,
     send: send,
     setIdentity: setIdentity,
+    setChannel: setChannel,
     getMode: function () { return state.mode; },
+    getChannel: function () { return state.channel; },
     /** 暴露给自动化测试与调试用，正常流程不会调用 */
     _offlineAnswer: offlineAnswer,
     _extractOrderId: extractOrderId,

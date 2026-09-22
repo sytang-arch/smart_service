@@ -78,9 +78,21 @@
       <span class="hint" id="chat-mode-hint">Dify Agent</span>
     </div>
 
+    <div class="chat-tabs" id="chat-tabs" hidden>
+      <button type="button" class="chat-tab is-on" data-channel="chat">工作台对话</button>
+      <button type="button" class="chat-tab" data-channel="embed">Dify 原生对话</button>
+    </div>
+
     <div class="chat-context" id="chat-context"></div>
 
     <div class="chat-body" id="chat-body"></div>
+
+    <div class="chat-embed" id="chat-embed" hidden>
+      <p class="embed-note" id="embed-note"></p>
+      <iframe id="chat-embed-frame" title="Dify Agent 原生对话"
+              allow="microphone; clipboard-write; fullscreen"
+              referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </div>
 
     <div class="chat-quick" id="chat-quick"></div>
 

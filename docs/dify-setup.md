@@ -332,14 +332,33 @@ Dify 提供两类做法：
 
 画布右上角 **发布 → 发布更新**。
 
+> ⚠️ **这一步不能省。** 只保存不发布的话，API Key 虽然能创建、`GET /v1/info` 也能返回应用名，
+> 但真正对话会返回：
+> ```json
+> {"code":"invalid_param","message":"Workflow not published","status":400}
+> ```
+> 这个报错很容易被误判成"Key 错了"或"代理有问题"，实际上是应用还停在草稿状态。
+> 判断方法：`curl -H "Authorization: Bearer app-xxx" https://api.dify.ai/v1/info` 能通，
+> 只说明 Key 有效；要验证发布状态得真的发一条消息，或看 `/parameters` 是否报 `app_unavailable`。
+
 ### 10.2 拿两个地址
 
 | 要拿的东西 | 位置 | 形如 | 用途 |
 | --- | --- | --- | --- |
 | **API Key** | 应用左侧「访问 API」→ 右上角「API 密钥」→ 创建 | `app-xxxxxxxx` | 服务端代理调用，**不要放前端** |
-| **WebApp 地址** | 应用「概览」页 | `https://udify.app/chatbot/xxxx` | 可选，嵌入式备用通道 |
+| **WebApp 地址** | 应用左侧「概览」页，或「访问 API」页里的 WebApp 链接 | `https://udify.app/chatbot/xxxx` | 嵌到页面里当备用通道，**这个可以公开** |
+
+这两个东西的安全性完全不同，别混：
+
+- **API Key 是机密**，等于应用的完整调用权，泄露了别人可以拿你的额度随便问；
+- **WebApp 地址是公开的**，就是给终端用户点的链接，谁拿到都能打开。
+
+所以"把 Agent 放上公开页面"有两条路：
+**代理路线**（Key 藏服务端，页面走自建 UI）或 **iframe 路线**（直接用公开的 WebApp 地址）。
 
 ### 10.3 接到本仓库的页面
+
+**路线 A：本地跑代理（Key 藏服务端，完整体验）**
 
 ```bash
 # 1. 在项目根目录建 .env（已被 .gitignore 排除，不会进仓库）
@@ -356,12 +375,16 @@ node server/index.js
 #    http://localhost:8787
 ```
 
-页面右下角状态会显示 **「Dify Agent 已连接」**。如果显示「规则兜底模式」，
-说明代理没起来或 Key 没配对 —— 按下面「常见报错」排查。
+**路线 B：部署到线上，让别人点链接就能用**
 
-> 想分享给别人：把 `server/` 部署成 Cloudflare Worker（见 `server/wrangler.toml.example`），
-> 然后把地址填进 `assets/js/config.js` 的 `API_BASE`。
-> **API Key 永远只放服务端的 Secret，不放前端。**
+| 要上线的部分 | 怎么做 | 页面里填哪一项 |
+| --- | --- | --- |
+| 页面 + 静态数据 | GitHub Pages（Settings → Pages → main / root） | —— |
+| 对话（零部署） | 在 Dify 把应用设为公开，复制 WebApp 地址 | `assets/js/config.js` → `DIFY_WEBAPP_URL` |
+| 对话（完整体验） | 部署 `server/worker.js` 到 Cloudflare Worker，Key 存 Worker Secret | `assets/js/config.js` → `API_BASE` |
+
+两条都填也可以：页面会优先用代理，代理不可用时自动切到 iframe，
+再不行才落到规则兜底。**API Key 永远只放服务端的 Secret，不放前端。**
 
 ---
 
@@ -389,6 +412,8 @@ node server/index.js
 
 | 现象 | 原因 | 处理 |
 | --- | --- | --- |
+| 对话返回 `Workflow not published` | 应用只保存了草稿，**没点发布** | 画布右上角「发布 → 发布更新」。这个报错跟 Key 无关，`/info` 是能通的 |
+| `/parameters` 返回 `app_unavailable` | 同上，应用没有已发布版本 | 同上 |
 | 页面显示「规则兜底模式」 | 代理没启动 / `API_BASE` 没填 | 确认 `node server/index.js` 在跑；打开 `http://localhost:8787/api/health` 看 `dify_configured` 是否为 `true` |
 | `/api/health` 里 `dify_configured: false` | `.env` 里 `DIFY_API_KEY` 为空 | 填上 Key 后**重启**服务（改 `.env` 不会热加载） |
 | Agent 回答"查不到该客户" | HTTP 节点 URL 里的用户名/仓库名没换成自己的 | 浏览器直接打开该 URL，能返回 JSON 才算对 |
