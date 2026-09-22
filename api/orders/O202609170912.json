@@ -1,0 +1,73 @@
+{
+  "order_id": "O202609170912",
+  "customer_id": "C1003",
+  "status": "in_transit",
+  "status_label": "运输中",
+  "created_at": "2026-09-17 12:24",
+  "paid_at": "2026-09-17 12:36",
+  "shipped_at": "2026-09-18 15:24",
+  "signed_at": null,
+  "completed_at": null,
+  "amount": 4999.0,
+  "currency": "CNY",
+  "pay_method": "在线支付（支付宝）",
+  "items": [
+    {
+      "sku": "SKU-A001",
+      "name": "星耀 X1 Pro 智能手机 256GB",
+      "price": 4999.0,
+      "qty": 1,
+      "subtotal": 4999.0
+    }
+  ],
+  "carrier": "京东物流",
+  "carrier_phone": "950616",
+  "tracking_no": "JD202609170912",
+  "estimated_delivery": "2026-09-21",
+  "address": "广州市天河区体育西路 103 号 2201",
+  "timeline": [
+    {
+      "at": "2026-09-17 12:24",
+      "text": "订单创建，等待付款",
+      "type": "order"
+    },
+    {
+      "at": "2026-09-17 12:36",
+      "text": "支付成功",
+      "type": "order"
+    },
+    {
+      "at": "2026-09-18 15:24",
+      "text": "京东物流 已揽收，运单号 JD202609170912",
+      "type": "ship"
+    },
+    {
+      "at": "2026-09-18 21:24",
+      "text": "已从【发货仓】发出",
+      "type": "ship"
+    },
+    {
+      "at": "2026-09-19 21:24",
+      "text": "到达【区域分拨中心】",
+      "type": "ship"
+    },
+    {
+      "at": "2026-09-20 21:24",
+      "text": "到达【城市转运中心】",
+      "type": "ship"
+    }
+  ],
+  "after_sale": null,
+  "refund_eligible": false,
+  "refund_deadline": null,
+  "refund_note": "",
+  "available_actions": [
+    "track_logistics",
+    "report_logistics_exception"
+  ],
+  "available_action_labels": [
+    "查询物流",
+    "申报物流异常"
+  ],
+  "internal_note": "高价值快件，需本人签收"
+}

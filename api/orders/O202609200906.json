@@ -1,0 +1,58 @@
+{
+  "order_id": "O202609200906",
+  "customer_id": "C1002",
+  "status": "paid",
+  "status_label": "待发货（已付款）",
+  "created_at": "2026-09-20 15:42",
+  "paid_at": "2026-09-20 15:54",
+  "shipped_at": null,
+  "signed_at": null,
+  "completed_at": null,
+  "amount": 5499.0,
+  "currency": "CNY",
+  "pay_method": "在线支付（支付宝）",
+  "items": [
+    {
+      "sku": "SKU-D001",
+      "name": "轻风 14 英寸轻薄笔记本",
+      "price": 5499.0,
+      "qty": 1,
+      "subtotal": 5499.0
+    }
+  ],
+  "carrier": null,
+  "carrier_phone": null,
+  "tracking_no": null,
+  "estimated_delivery": null,
+  "address": "北京市海淀区中关村大街 27 号 A 座 1801",
+  "timeline": [
+    {
+      "at": "2026-09-20 15:42",
+      "text": "订单创建，等待付款",
+      "type": "order"
+    },
+    {
+      "at": "2026-09-20 15:54",
+      "text": "支付成功",
+      "type": "order"
+    },
+    {
+      "at": "2026-09-20 17:42",
+      "text": "仓库已接单，正在拣货打包",
+      "type": "info"
+    }
+  ],
+  "after_sale": null,
+  "refund_eligible": true,
+  "refund_deadline": null,
+  "refund_note": "未发货订单可直接取消并全额退款",
+  "available_actions": [
+    "cancel_order",
+    "urge_shipping"
+  ],
+  "available_action_labels": [
+    "取消订单",
+    "催发货"
+  ],
+  "internal_note": ""
+}

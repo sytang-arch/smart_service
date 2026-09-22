@@ -1,0 +1,53 @@
+{
+  "order_id": "O202609220926",
+  "customer_id": "C1006",
+  "status": "pending_payment",
+  "status_label": "待付款",
+  "created_at": "2026-09-22 17:02",
+  "paid_at": null,
+  "shipped_at": null,
+  "signed_at": null,
+  "completed_at": null,
+  "amount": 1399.0,
+  "currency": "CNY",
+  "pay_method": "在线支付（支付宝）",
+  "items": [
+    {
+      "sku": "SKU-H001",
+      "name": "视界 27 英寸 2K 显示器",
+      "price": 1399.0,
+      "qty": 1,
+      "subtotal": 1399.0
+    }
+  ],
+  "carrier": null,
+  "carrier_phone": null,
+  "tracking_no": null,
+  "estimated_delivery": null,
+  "address": "杭州市西湖区文三路 259 号 2 幢 1602",
+  "timeline": [
+    {
+      "at": "2026-09-22 17:02",
+      "text": "订单创建，等待付款",
+      "type": "order"
+    },
+    {
+      "at": "2026-09-23 17:02",
+      "text": "已发送付款提醒，24 小时内未付款将自动关闭订单",
+      "type": "warn"
+    }
+  ],
+  "after_sale": null,
+  "refund_eligible": false,
+  "refund_deadline": null,
+  "refund_note": "",
+  "available_actions": [
+    "cancel_order",
+    "pay_reminder"
+  ],
+  "available_action_labels": [
+    "取消订单",
+    "获取支付链接"
+  ],
+  "internal_note": ""
+}

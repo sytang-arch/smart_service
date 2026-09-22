@@ -1,0 +1,73 @@
+{
+  "order_id": "O202609160922",
+  "customer_id": "C1005",
+  "status": "in_transit",
+  "status_label": "运输中",
+  "created_at": "2026-09-16 13:34",
+  "paid_at": "2026-09-16 13:46",
+  "shipped_at": "2026-09-17 16:34",
+  "signed_at": null,
+  "completed_at": null,
+  "amount": 2699.0,
+  "currency": "CNY",
+  "pay_method": "在线支付（支付宝）",
+  "items": [
+    {
+      "sku": "SKU-C001",
+      "name": "云阅 11 英寸平板电脑",
+      "price": 2699.0,
+      "qty": 1,
+      "subtotal": 2699.0
+    }
+  ],
+  "carrier": "京东物流",
+  "carrier_phone": "950616",
+  "tracking_no": "JD202609160922",
+  "estimated_delivery": "2026-09-20",
+  "address": "深圳市南山区科苑南路 2666 号 5 栋 801",
+  "timeline": [
+    {
+      "at": "2026-09-16 13:34",
+      "text": "订单创建，等待付款",
+      "type": "order"
+    },
+    {
+      "at": "2026-09-16 13:46",
+      "text": "支付成功",
+      "type": "order"
+    },
+    {
+      "at": "2026-09-17 16:34",
+      "text": "京东物流 已揽收，运单号 JD202609160922",
+      "type": "ship"
+    },
+    {
+      "at": "2026-09-17 22:34",
+      "text": "已从【发货仓】发出",
+      "type": "ship"
+    },
+    {
+      "at": "2026-09-18 22:34",
+      "text": "到达【区域分拨中心】",
+      "type": "ship"
+    },
+    {
+      "at": "2026-09-19 22:34",
+      "text": "到达【城市转运中心】",
+      "type": "ship"
+    }
+  ],
+  "after_sale": null,
+  "refund_eligible": false,
+  "refund_deadline": null,
+  "refund_note": "",
+  "available_actions": [
+    "track_logistics",
+    "report_logistics_exception"
+  ],
+  "available_action_labels": [
+    "查询物流",
+    "申报物流异常"
+  ],
+  "internal_note": ""
+}

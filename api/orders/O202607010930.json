@@ -1,0 +1,85 @@
+{
+  "order_id": "O202607010930",
+  "customer_id": "C1006",
+  "status": "completed",
+  "status_label": "已完成",
+  "created_at": "2026-07-01 12:30",
+  "paid_at": "2026-07-01 12:42",
+  "shipped_at": "2026-07-02 15:30",
+  "signed_at": null,
+  "completed_at": "2026-07-05 00:00",
+  "amount": 399.0,
+  "currency": "CNY",
+  "pay_method": "在线支付（支付宝）",
+  "items": [
+    {
+      "sku": "SKU-C002",
+      "name": "云阅平板磁吸键盘保护套",
+      "price": 399.0,
+      "qty": 1,
+      "subtotal": 399.0
+    }
+  ],
+  "carrier": "京东物流",
+  "carrier_phone": "950616",
+  "tracking_no": "JD202607010930",
+  "estimated_delivery": null,
+  "address": "杭州市西湖区文三路 259 号 2 幢 1602",
+  "timeline": [
+    {
+      "at": "2026-07-01 12:30",
+      "text": "订单创建，等待付款",
+      "type": "order"
+    },
+    {
+      "at": "2026-07-01 12:42",
+      "text": "支付成功",
+      "type": "order"
+    },
+    {
+      "at": "2026-07-02 15:30",
+      "text": "京东物流 已揽收，运单号 JD202607010930",
+      "type": "ship"
+    },
+    {
+      "at": "2026-07-02 21:30",
+      "text": "已从【发货仓】发出",
+      "type": "ship"
+    },
+    {
+      "at": "2026-07-03 21:30",
+      "text": "到达【区域分拨中心】",
+      "type": "ship"
+    },
+    {
+      "at": "2026-07-04 21:30",
+      "text": "到达【城市转运中心】",
+      "type": "ship"
+    },
+    {
+      "at": "2026-07-05 21:30",
+      "text": "派送中，配送员正在为您派送",
+      "type": "ship"
+    },
+    {
+      "at": "2026-07-05 00:00",
+      "text": "订单完成（已过售后期）",
+      "type": "ok"
+    }
+  ],
+  "after_sale": null,
+  "refund_eligible": false,
+  "refund_deadline": null,
+  "refund_note": "",
+  "available_actions": [
+    "apply_repair",
+    "apply_exchange",
+    "invoice_query"
+  ],
+  "available_action_labels": [
+    "申请维修",
+    "申请换货",
+    "查询发票"
+  ],
+  "internal_note": ""
+}

@@ -1,0 +1,85 @@
+{
+  "order_id": "O202609140904",
+  "customer_id": "C1001",
+  "status": "delivered",
+  "status_label": "已签收",
+  "created_at": "2026-09-14 13:28",
+  "paid_at": "2026-09-14 13:40",
+  "shipped_at": "2026-09-15 16:28",
+  "signed_at": "2026-09-18 14:32",
+  "completed_at": null,
+  "amount": 1099.0,
+  "currency": "CNY",
+  "pay_method": "在线支付（支付宝）",
+  "items": [
+    {
+      "sku": "SKU-F001",
+      "name": "律动 Watch S2 智能手表",
+      "price": 1099.0,
+      "qty": 1,
+      "subtotal": 1099.0
+    }
+  ],
+  "carrier": "中通快递",
+  "carrier_phone": "95311",
+  "tracking_no": "ZTO202609140904",
+  "estimated_delivery": null,
+  "address": "上海市浦东新区张江路 88 号 3 号楼 502",
+  "timeline": [
+    {
+      "at": "2026-09-14 13:28",
+      "text": "订单创建，等待付款",
+      "type": "order"
+    },
+    {
+      "at": "2026-09-14 13:40",
+      "text": "支付成功",
+      "type": "order"
+    },
+    {
+      "at": "2026-09-15 16:28",
+      "text": "中通快递 已揽收，运单号 ZTO202609140904",
+      "type": "ship"
+    },
+    {
+      "at": "2026-09-15 22:28",
+      "text": "已从【发货仓】发出",
+      "type": "ship"
+    },
+    {
+      "at": "2026-09-16 22:28",
+      "text": "到达【区域分拨中心】",
+      "type": "ship"
+    },
+    {
+      "at": "2026-09-17 22:28",
+      "text": "到达【城市转运中心】",
+      "type": "ship"
+    },
+    {
+      "at": "2026-09-18 22:28",
+      "text": "派送中，配送员正在为您派送",
+      "type": "ship"
+    },
+    {
+      "at": "2026-09-18 14:32",
+      "text": "已签收，感谢使用",
+      "type": "ok"
+    }
+  ],
+  "after_sale": null,
+  "refund_eligible": true,
+  "refund_deadline": "2026-09-25",
+  "refund_note": "签收后 4 天内，可享 7 天无理由退货",
+  "available_actions": [
+    "apply_refund",
+    "track_logistics",
+    "apply_exchange"
+  ],
+  "available_action_labels": [
+    "申请退款",
+    "查询物流",
+    "申请换货"
+  ],
+  "internal_note": "签收 2026-09-18"
+}

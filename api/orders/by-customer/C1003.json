@@ -1,0 +1,395 @@
+{
+  "customer_id": "C1003",
+  "customer_name": "王强",
+  "data_as_of": "2026-09-22",
+  "count": 5,
+  "orders": [
+    {
+      "order_id": "O202609220911",
+      "customer_id": "C1003",
+      "status": "pending_payment",
+      "status_label": "待付款",
+      "created_at": "2026-09-22 11:17",
+      "paid_at": null,
+      "shipped_at": null,
+      "signed_at": null,
+      "completed_at": null,
+      "amount": 219.0,
+      "currency": "CNY",
+      "pay_method": "在线支付（微信）",
+      "items": [
+        {
+          "sku": "SKU-E002",
+          "name": "耐力 20000mAh 移动电源",
+          "price": 219.0,
+          "qty": 1,
+          "subtotal": 219.0
+        }
+      ],
+      "carrier": null,
+      "carrier_phone": null,
+      "tracking_no": null,
+      "estimated_delivery": null,
+      "address": "广州市天河区体育西路 103 号 2201",
+      "timeline": [
+        {
+          "at": "2026-09-22 11:17",
+          "text": "订单创建，等待付款",
+          "type": "order"
+        },
+        {
+          "at": "2026-09-23 11:17",
+          "text": "已发送付款提醒，24 小时内未付款将自动关闭订单",
+          "type": "warn"
+        }
+      ],
+      "after_sale": null,
+      "refund_eligible": false,
+      "refund_deadline": null,
+      "refund_note": "",
+      "available_actions": [
+        "cancel_order",
+        "pay_reminder"
+      ],
+      "available_action_labels": [
+        "取消订单",
+        "获取支付链接"
+      ],
+      "internal_note": ""
+    },
+    {
+      "order_id": "O202609170912",
+      "customer_id": "C1003",
+      "status": "in_transit",
+      "status_label": "运输中",
+      "created_at": "2026-09-17 12:24",
+      "paid_at": "2026-09-17 12:36",
+      "shipped_at": "2026-09-18 15:24",
+      "signed_at": null,
+      "completed_at": null,
+      "amount": 4999.0,
+      "currency": "CNY",
+      "pay_method": "在线支付（支付宝）",
+      "items": [
+        {
+          "sku": "SKU-A001",
+          "name": "星耀 X1 Pro 智能手机 256GB",
+          "price": 4999.0,
+          "qty": 1,
+          "subtotal": 4999.0
+        }
+      ],
+      "carrier": "京东物流",
+      "carrier_phone": "950616",
+      "tracking_no": "JD202609170912",
+      "estimated_delivery": "2026-09-21",
+      "address": "广州市天河区体育西路 103 号 2201",
+      "timeline": [
+        {
+          "at": "2026-09-17 12:24",
+          "text": "订单创建，等待付款",
+          "type": "order"
+        },
+        {
+          "at": "2026-09-17 12:36",
+          "text": "支付成功",
+          "type": "order"
+        },
+        {
+          "at": "2026-09-18 15:24",
+          "text": "京东物流 已揽收，运单号 JD202609170912",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-18 21:24",
+          "text": "已从【发货仓】发出",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-19 21:24",
+          "text": "到达【区域分拨中心】",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-20 21:24",
+          "text": "到达【城市转运中心】",
+          "type": "ship"
+        }
+      ],
+      "after_sale": null,
+      "refund_eligible": false,
+      "refund_deadline": null,
+      "refund_note": "",
+      "available_actions": [
+        "track_logistics",
+        "report_logistics_exception"
+      ],
+      "available_action_labels": [
+        "查询物流",
+        "申报物流异常"
+      ],
+      "internal_note": "高价值快件，需本人签收"
+    },
+    {
+      "order_id": "O202609120913",
+      "customer_id": "C1003",
+      "status": "delivered",
+      "status_label": "已签收",
+      "created_at": "2026-09-12 13:31",
+      "paid_at": "2026-09-12 13:43",
+      "shipped_at": "2026-09-13 16:31",
+      "signed_at": "2026-09-16 14:32",
+      "completed_at": null,
+      "amount": 799.0,
+      "currency": "CNY",
+      "pay_method": "在线支付（微信）",
+      "items": [
+        {
+          "sku": "SKU-B001",
+          "name": "声动 Air 真无线降噪耳机",
+          "price": 799.0,
+          "qty": 1,
+          "subtotal": 799.0
+        }
+      ],
+      "carrier": "中通快递",
+      "carrier_phone": "95311",
+      "tracking_no": "ZTO202609120913",
+      "estimated_delivery": null,
+      "address": "广州市天河区体育西路 103 号 2201",
+      "timeline": [
+        {
+          "at": "2026-09-12 13:31",
+          "text": "订单创建，等待付款",
+          "type": "order"
+        },
+        {
+          "at": "2026-09-12 13:43",
+          "text": "支付成功",
+          "type": "order"
+        },
+        {
+          "at": "2026-09-13 16:31",
+          "text": "中通快递 已揽收，运单号 ZTO202609120913",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-13 22:31",
+          "text": "已从【发货仓】发出",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-14 22:31",
+          "text": "到达【区域分拨中心】",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-15 22:31",
+          "text": "到达【城市转运中心】",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-16 22:31",
+          "text": "派送中，配送员正在为您派送",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-16 14:32",
+          "text": "已签收，感谢使用",
+          "type": "ok"
+        }
+      ],
+      "after_sale": null,
+      "refund_eligible": true,
+      "refund_deadline": "2026-09-23",
+      "refund_note": "签收后 6 天内，可享 7 天无理由退货",
+      "available_actions": [
+        "apply_refund",
+        "track_logistics",
+        "apply_exchange"
+      ],
+      "available_action_labels": [
+        "申请退款",
+        "查询物流",
+        "申请换货"
+      ],
+      "internal_note": "签收 2026-09-16"
+    },
+    {
+      "order_id": "O202608280914",
+      "customer_id": "C1003",
+      "status": "refunded",
+      "status_label": "已退款",
+      "created_at": "2026-08-28 14:38",
+      "paid_at": "2026-08-28 14:50",
+      "shipped_at": "2026-08-29 17:38",
+      "signed_at": null,
+      "completed_at": null,
+      "amount": 1099.0,
+      "currency": "CNY",
+      "pay_method": "在线支付（支付宝）",
+      "items": [
+        {
+          "sku": "SKU-F001",
+          "name": "律动 Watch S2 智能手表",
+          "price": 1099.0,
+          "qty": 1,
+          "subtotal": 1099.0
+        }
+      ],
+      "carrier": "中通快递",
+      "carrier_phone": "95311",
+      "tracking_no": "ZTO202608280914",
+      "estimated_delivery": null,
+      "address": "广州市天河区体育西路 103 号 2201",
+      "timeline": [
+        {
+          "at": "2026-08-28 14:38",
+          "text": "订单创建，等待付款",
+          "type": "order"
+        },
+        {
+          "at": "2026-08-28 14:50",
+          "text": "支付成功",
+          "type": "order"
+        },
+        {
+          "at": "2026-08-29 17:38",
+          "text": "中通快递 已揽收，运单号 ZTO202608280914",
+          "type": "ship"
+        },
+        {
+          "at": "2026-08-29 23:38",
+          "text": "已从【发货仓】发出",
+          "type": "ship"
+        },
+        {
+          "at": "2026-08-30 23:38",
+          "text": "到达【区域分拨中心】",
+          "type": "ship"
+        },
+        {
+          "at": "2026-08-31 23:38",
+          "text": "到达【城市转运中心】",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-01 23:38",
+          "text": "派送中，配送员正在为您派送",
+          "type": "ship"
+        },
+        {
+          "at": "2026-08-31 14:38",
+          "text": "退款已原路退回，预计 1-3 个工作日到账",
+          "type": "ok"
+        }
+      ],
+      "after_sale": {
+        "ticket_id": "AS08280914",
+        "type": "退款",
+        "status": "已完成",
+        "reason": "物流破损",
+        "applied_at": "2026-08-29",
+        "refund_amount": 1099.0,
+        "expect": "已退款"
+      },
+      "refund_eligible": false,
+      "refund_deadline": null,
+      "refund_note": "",
+      "available_actions": [
+        "query_after_sale",
+        "reorder"
+      ],
+      "available_action_labels": [
+        "查看售后进度",
+        "再次购买"
+      ],
+      "internal_note": "物流破损，已全额退款 1099.00 元"
+    },
+    {
+      "order_id": "O202604150915",
+      "customer_id": "C1003",
+      "status": "completed",
+      "status_label": "已完成",
+      "created_at": "2026-04-15 15:45",
+      "paid_at": "2026-04-15 15:57",
+      "shipped_at": "2026-04-16 18:45",
+      "signed_at": null,
+      "completed_at": "2026-04-19 00:00",
+      "amount": 1399.0,
+      "currency": "CNY",
+      "pay_method": "在线支付（微信）",
+      "items": [
+        {
+          "sku": "SKU-H001",
+          "name": "视界 27 英寸 2K 显示器",
+          "price": 1399.0,
+          "qty": 1,
+          "subtotal": 1399.0
+        }
+      ],
+      "carrier": "顺丰速运",
+      "carrier_phone": "95338",
+      "tracking_no": "SF202604150915",
+      "estimated_delivery": null,
+      "address": "广州市天河区体育西路 103 号 2201",
+      "timeline": [
+        {
+          "at": "2026-04-15 15:45",
+          "text": "订单创建，等待付款",
+          "type": "order"
+        },
+        {
+          "at": "2026-04-15 15:57",
+          "text": "支付成功",
+          "type": "order"
+        },
+        {
+          "at": "2026-04-16 18:45",
+          "text": "顺丰速运 已揽收，运单号 SF202604150915",
+          "type": "ship"
+        },
+        {
+          "at": "2026-04-17 00:45",
+          "text": "已从【发货仓】发出",
+          "type": "ship"
+        },
+        {
+          "at": "2026-04-18 00:45",
+          "text": "到达【区域分拨中心】",
+          "type": "ship"
+        },
+        {
+          "at": "2026-04-19 00:45",
+          "text": "到达【城市转运中心】",
+          "type": "ship"
+        },
+        {
+          "at": "2026-04-20 00:45",
+          "text": "派送中，配送员正在为您派送",
+          "type": "ship"
+        },
+        {
+          "at": "2026-04-19 00:00",
+          "text": "订单完成（已过售后期）",
+          "type": "ok"
+        }
+      ],
+      "after_sale": null,
+      "refund_eligible": false,
+      "refund_deadline": null,
+      "refund_note": "",
+      "available_actions": [
+        "apply_repair",
+        "apply_exchange",
+        "invoice_query"
+      ],
+      "available_action_labels": [
+        "申请维修",
+        "申请换货",
+        "查询发票"
+      ],
+      "internal_note": ""
+    }
+  ]
+}

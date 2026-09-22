@@ -1,0 +1,89 @@
+{
+  "order_id": "O202608110924",
+  "customer_id": "C1005",
+  "status": "after_sale",
+  "status_label": "售后处理中",
+  "created_at": "2026-08-11 15:48",
+  "paid_at": "2026-08-11 16:00",
+  "shipped_at": "2026-08-12 18:48",
+  "signed_at": null,
+  "completed_at": null,
+  "amount": 4999.0,
+  "currency": "CNY",
+  "pay_method": "在线支付（支付宝）",
+  "items": [
+    {
+      "sku": "SKU-A001",
+      "name": "星耀 X1 Pro 智能手机 256GB",
+      "price": 4999.0,
+      "qty": 1,
+      "subtotal": 4999.0
+    }
+  ],
+  "carrier": "京东物流",
+  "carrier_phone": "950616",
+  "tracking_no": "JD202608110924",
+  "estimated_delivery": null,
+  "address": "深圳市南山区科苑南路 2666 号 5 栋 801",
+  "timeline": [
+    {
+      "at": "2026-08-11 15:48",
+      "text": "订单创建，等待付款",
+      "type": "order"
+    },
+    {
+      "at": "2026-08-11 16:00",
+      "text": "支付成功",
+      "type": "order"
+    },
+    {
+      "at": "2026-08-12 18:48",
+      "text": "京东物流 已揽收，运单号 JD202608110924",
+      "type": "ship"
+    },
+    {
+      "at": "2026-08-13 00:48",
+      "text": "已从【发货仓】发出",
+      "type": "ship"
+    },
+    {
+      "at": "2026-08-14 00:48",
+      "text": "到达【区域分拨中心】",
+      "type": "ship"
+    },
+    {
+      "at": "2026-08-15 00:48",
+      "text": "到达【城市转运中心】",
+      "type": "ship"
+    },
+    {
+      "at": "2026-08-16 00:48",
+      "text": "派送中，配送员正在为您派送",
+      "type": "ship"
+    },
+    {
+      "at": "2026-08-14 15:48",
+      "text": "售后单已受理，等待检测/审核",
+      "type": "warn"
+    }
+  ],
+  "after_sale": {
+    "ticket_id": "AS08110924",
+    "type": "换货",
+    "status": "待寄回",
+    "reason": "商品质量问题（屏幕亮点）",
+    "applied_at": "2026-08-12",
+    "refund_amount": null,
+    "expect": "审核通过后 24 小时内寄出换新机"
+  },
+  "refund_eligible": false,
+  "refund_deadline": null,
+  "refund_note": "",
+  "available_actions": [
+    "query_after_sale"
+  ],
+  "available_action_labels": [
+    "查看售后进度"
+  ],
+  "internal_note": "屏幕亮点，换货申请中"
+}

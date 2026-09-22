@@ -1,0 +1,14 @@
+# Cloudflare Worker 配置示例
+# 用法：复制为 wrangler.toml，把 name 改成你自己的，然后
+#   wrangler secret put DIFY_API_KEY
+#   wrangler deploy
+
+name = "smart-service-proxy"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+# 非密钥配置写在这里；DIFY_API_KEY 必须用 wrangler secret put 设置
+[vars]
+DIFY_API_BASE = "https://api.dify.ai/v1"
+DIFY_IDENTITY_MODE = "inputs"
+DIFY_APP_NAME = "云栖智能客服 Agent"

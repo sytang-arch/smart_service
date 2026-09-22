@@ -1,0 +1,58 @@
+{
+  "order_id": "O202609200927",
+  "customer_id": "C1006",
+  "status": "paid",
+  "status_label": "待发货（已付款）",
+  "created_at": "2026-09-20 09:09",
+  "paid_at": "2026-09-20 09:21",
+  "shipped_at": null,
+  "signed_at": null,
+  "completed_at": null,
+  "amount": 1598.0,
+  "currency": "CNY",
+  "pay_method": "在线支付（微信）",
+  "items": [
+    {
+      "sku": "SKU-B001",
+      "name": "声动 Air 真无线降噪耳机",
+      "price": 799.0,
+      "qty": 2,
+      "subtotal": 1598.0
+    }
+  ],
+  "carrier": null,
+  "carrier_phone": null,
+  "tracking_no": null,
+  "estimated_delivery": null,
+  "address": "杭州市西湖区文三路 259 号 2 幢 1602",
+  "timeline": [
+    {
+      "at": "2026-09-20 09:09",
+      "text": "订单创建，等待付款",
+      "type": "order"
+    },
+    {
+      "at": "2026-09-20 09:21",
+      "text": "支付成功",
+      "type": "order"
+    },
+    {
+      "at": "2026-09-20 11:09",
+      "text": "仓库已接单，正在拣货打包",
+      "type": "info"
+    }
+  ],
+  "after_sale": null,
+  "refund_eligible": true,
+  "refund_deadline": null,
+  "refund_note": "未发货订单可直接取消并全额退款",
+  "available_actions": [
+    "cancel_order",
+    "urge_shipping"
+  ],
+  "available_action_labels": [
+    "取消订单",
+    "催发货"
+  ],
+  "internal_note": ""
+}

@@ -1,0 +1,58 @@
+{
+  "order_id": "O202609190921",
+  "customer_id": "C1005",
+  "status": "paid",
+  "status_label": "待发货（已付款）",
+  "created_at": "2026-09-19 12:27",
+  "paid_at": "2026-09-19 12:39",
+  "shipped_at": null,
+  "signed_at": null,
+  "completed_at": null,
+  "amount": 2198.0,
+  "currency": "CNY",
+  "pay_method": "在线支付（微信）",
+  "items": [
+    {
+      "sku": "SKU-F001",
+      "name": "律动 Watch S2 智能手表",
+      "price": 1099.0,
+      "qty": 2,
+      "subtotal": 2198.0
+    }
+  ],
+  "carrier": null,
+  "carrier_phone": null,
+  "tracking_no": null,
+  "estimated_delivery": null,
+  "address": "深圳市南山区科苑南路 2666 号 5 栋 801",
+  "timeline": [
+    {
+      "at": "2026-09-19 12:27",
+      "text": "订单创建，等待付款",
+      "type": "order"
+    },
+    {
+      "at": "2026-09-19 12:39",
+      "text": "支付成功",
+      "type": "order"
+    },
+    {
+      "at": "2026-09-19 14:27",
+      "text": "仓库已接单，正在拣货打包",
+      "type": "info"
+    }
+  ],
+  "after_sale": null,
+  "refund_eligible": true,
+  "refund_deadline": null,
+  "refund_note": "未发货订单可直接取消并全额退款",
+  "available_actions": [
+    "cancel_order",
+    "urge_shipping"
+  ],
+  "available_action_labels": [
+    "取消订单",
+    "催发货"
+  ],
+  "internal_note": ""
+}

@@ -1,0 +1,362 @@
+{
+  "customer_id": "C1001",
+  "customer_name": "张伟",
+  "data_as_of": "2026-09-22",
+  "count": 5,
+  "orders": [
+    {
+      "order_id": "O202609210901",
+      "customer_id": "C1001",
+      "status": "pending_payment",
+      "status_label": "待付款",
+      "created_at": "2026-09-21 10:07",
+      "paid_at": null,
+      "shipped_at": null,
+      "signed_at": null,
+      "completed_at": null,
+      "amount": 799.0,
+      "currency": "CNY",
+      "pay_method": "在线支付（微信）",
+      "items": [
+        {
+          "sku": "SKU-B001",
+          "name": "声动 Air 真无线降噪耳机",
+          "price": 799.0,
+          "qty": 1,
+          "subtotal": 799.0
+        }
+      ],
+      "carrier": null,
+      "carrier_phone": null,
+      "tracking_no": null,
+      "estimated_delivery": null,
+      "address": "上海市浦东新区张江路 88 号 3 号楼 502",
+      "timeline": [
+        {
+          "at": "2026-09-21 10:07",
+          "text": "订单创建，等待付款",
+          "type": "order"
+        },
+        {
+          "at": "2026-09-22 10:07",
+          "text": "已发送付款提醒，24 小时内未付款将自动关闭订单",
+          "type": "warn"
+        }
+      ],
+      "after_sale": null,
+      "refund_eligible": false,
+      "refund_deadline": null,
+      "refund_note": "",
+      "available_actions": [
+        "cancel_order",
+        "pay_reminder"
+      ],
+      "available_action_labels": [
+        "取消订单",
+        "获取支付链接"
+      ],
+      "internal_note": ""
+    },
+    {
+      "order_id": "O202609190902",
+      "customer_id": "C1001",
+      "status": "paid",
+      "status_label": "待发货（已付款）",
+      "created_at": "2026-09-19 11:14",
+      "paid_at": "2026-09-19 11:26",
+      "shipped_at": null,
+      "signed_at": null,
+      "completed_at": null,
+      "amount": 4999.0,
+      "currency": "CNY",
+      "pay_method": "在线支付（支付宝）",
+      "items": [
+        {
+          "sku": "SKU-A001",
+          "name": "星耀 X1 Pro 智能手机 256GB",
+          "price": 4999.0,
+          "qty": 1,
+          "subtotal": 4999.0
+        }
+      ],
+      "carrier": null,
+      "carrier_phone": null,
+      "tracking_no": null,
+      "estimated_delivery": null,
+      "address": "上海市浦东新区张江路 88 号 3 号楼 502",
+      "timeline": [
+        {
+          "at": "2026-09-19 11:14",
+          "text": "订单创建，等待付款",
+          "type": "order"
+        },
+        {
+          "at": "2026-09-19 11:26",
+          "text": "支付成功",
+          "type": "order"
+        },
+        {
+          "at": "2026-09-19 13:14",
+          "text": "仓库已接单，正在拣货打包",
+          "type": "info"
+        }
+      ],
+      "after_sale": null,
+      "refund_eligible": true,
+      "refund_deadline": null,
+      "refund_note": "未发货订单可直接取消并全额退款",
+      "available_actions": [
+        "cancel_order",
+        "urge_shipping"
+      ],
+      "available_action_labels": [
+        "取消订单",
+        "催发货"
+      ],
+      "internal_note": ""
+    },
+    {
+      "order_id": "O202609140903",
+      "customer_id": "C1001",
+      "status": "in_transit",
+      "status_label": "运输中",
+      "created_at": "2026-09-14 12:21",
+      "paid_at": "2026-09-14 12:33",
+      "shipped_at": "2026-09-15 15:21",
+      "signed_at": null,
+      "completed_at": null,
+      "amount": 298.0,
+      "currency": "CNY",
+      "pay_method": "在线支付（微信）",
+      "items": [
+        {
+          "sku": "SKU-E001",
+          "name": "极速 65W 氮化镓充电器",
+          "price": 149.0,
+          "qty": 2,
+          "subtotal": 298.0
+        }
+      ],
+      "carrier": "顺丰速运",
+      "carrier_phone": "95338",
+      "tracking_no": "SF202609140903",
+      "estimated_delivery": "2026-09-18",
+      "address": "上海市浦东新区张江路 88 号 3 号楼 502",
+      "timeline": [
+        {
+          "at": "2026-09-14 12:21",
+          "text": "订单创建，等待付款",
+          "type": "order"
+        },
+        {
+          "at": "2026-09-14 12:33",
+          "text": "支付成功",
+          "type": "order"
+        },
+        {
+          "at": "2026-09-15 15:21",
+          "text": "顺丰速运 已揽收，运单号 SF202609140903",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-15 21:21",
+          "text": "已从【发货仓】发出",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-16 21:21",
+          "text": "到达【区域分拨中心】",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-17 21:21",
+          "text": "到达【城市转运中心】",
+          "type": "ship"
+        }
+      ],
+      "after_sale": null,
+      "refund_eligible": false,
+      "refund_deadline": null,
+      "refund_note": "",
+      "available_actions": [
+        "track_logistics",
+        "report_logistics_exception"
+      ],
+      "available_action_labels": [
+        "查询物流",
+        "申报物流异常"
+      ],
+      "internal_note": ""
+    },
+    {
+      "order_id": "O202609140904",
+      "customer_id": "C1001",
+      "status": "delivered",
+      "status_label": "已签收",
+      "created_at": "2026-09-14 13:28",
+      "paid_at": "2026-09-14 13:40",
+      "shipped_at": "2026-09-15 16:28",
+      "signed_at": "2026-09-18 14:32",
+      "completed_at": null,
+      "amount": 1099.0,
+      "currency": "CNY",
+      "pay_method": "在线支付（支付宝）",
+      "items": [
+        {
+          "sku": "SKU-F001",
+          "name": "律动 Watch S2 智能手表",
+          "price": 1099.0,
+          "qty": 1,
+          "subtotal": 1099.0
+        }
+      ],
+      "carrier": "中通快递",
+      "carrier_phone": "95311",
+      "tracking_no": "ZTO202609140904",
+      "estimated_delivery": null,
+      "address": "上海市浦东新区张江路 88 号 3 号楼 502",
+      "timeline": [
+        {
+          "at": "2026-09-14 13:28",
+          "text": "订单创建，等待付款",
+          "type": "order"
+        },
+        {
+          "at": "2026-09-14 13:40",
+          "text": "支付成功",
+          "type": "order"
+        },
+        {
+          "at": "2026-09-15 16:28",
+          "text": "中通快递 已揽收，运单号 ZTO202609140904",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-15 22:28",
+          "text": "已从【发货仓】发出",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-16 22:28",
+          "text": "到达【区域分拨中心】",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-17 22:28",
+          "text": "到达【城市转运中心】",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-18 22:28",
+          "text": "派送中，配送员正在为您派送",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-18 14:32",
+          "text": "已签收，感谢使用",
+          "type": "ok"
+        }
+      ],
+      "after_sale": null,
+      "refund_eligible": true,
+      "refund_deadline": "2026-09-25",
+      "refund_note": "签收后 4 天内，可享 7 天无理由退货",
+      "available_actions": [
+        "apply_refund",
+        "track_logistics",
+        "apply_exchange"
+      ],
+      "available_action_labels": [
+        "申请退款",
+        "查询物流",
+        "申请换货"
+      ],
+      "internal_note": "签收 2026-09-18"
+    },
+    {
+      "order_id": "O202606100905",
+      "customer_id": "C1001",
+      "status": "completed",
+      "status_label": "已完成",
+      "created_at": "2026-06-10 14:35",
+      "paid_at": "2026-06-10 14:47",
+      "shipped_at": "2026-06-11 17:35",
+      "signed_at": null,
+      "completed_at": "2026-06-14 00:00",
+      "amount": 2699.0,
+      "currency": "CNY",
+      "pay_method": "在线支付（微信）",
+      "items": [
+        {
+          "sku": "SKU-C001",
+          "name": "云阅 11 英寸平板电脑",
+          "price": 2699.0,
+          "qty": 1,
+          "subtotal": 2699.0
+        }
+      ],
+      "carrier": "京东物流",
+      "carrier_phone": "950616",
+      "tracking_no": "JD202606100905",
+      "estimated_delivery": null,
+      "address": "上海市浦东新区张江路 88 号 3 号楼 502",
+      "timeline": [
+        {
+          "at": "2026-06-10 14:35",
+          "text": "订单创建，等待付款",
+          "type": "order"
+        },
+        {
+          "at": "2026-06-10 14:47",
+          "text": "支付成功",
+          "type": "order"
+        },
+        {
+          "at": "2026-06-11 17:35",
+          "text": "京东物流 已揽收，运单号 JD202606100905",
+          "type": "ship"
+        },
+        {
+          "at": "2026-06-11 23:35",
+          "text": "已从【发货仓】发出",
+          "type": "ship"
+        },
+        {
+          "at": "2026-06-12 23:35",
+          "text": "到达【区域分拨中心】",
+          "type": "ship"
+        },
+        {
+          "at": "2026-06-13 23:35",
+          "text": "到达【城市转运中心】",
+          "type": "ship"
+        },
+        {
+          "at": "2026-06-14 23:35",
+          "text": "派送中，配送员正在为您派送",
+          "type": "ship"
+        },
+        {
+          "at": "2026-06-14 00:00",
+          "text": "订单完成（已过售后期）",
+          "type": "ok"
+        }
+      ],
+      "after_sale": null,
+      "refund_eligible": false,
+      "refund_deadline": null,
+      "refund_note": "",
+      "available_actions": [
+        "apply_repair",
+        "apply_exchange",
+        "invoice_query"
+      ],
+      "available_action_labels": [
+        "申请维修",
+        "申请换货",
+        "查询发票"
+      ],
+      "internal_note": ""
+    }
+  ]
+}

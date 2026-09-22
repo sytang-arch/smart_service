@@ -1,0 +1,15 @@
+{
+  "name": "smart-service-dify-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "基于 Dify Agent 的电商智能客服 Demo：客服工作台 + 订单/物流/售后查询 + 身份隔离",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "data": "python tools/generate_data.py",
+    "deploy:worker": "wrangler deploy"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

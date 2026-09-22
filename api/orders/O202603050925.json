@@ -1,0 +1,85 @@
+{
+  "order_id": "O202603050925",
+  "customer_id": "C1005",
+  "status": "completed",
+  "status_label": "已完成",
+  "created_at": "2026-03-05 16:55",
+  "paid_at": "2026-03-05 17:07",
+  "shipped_at": "2026-03-06 19:55",
+  "signed_at": null,
+  "completed_at": "2026-03-09 00:00",
+  "amount": 799.0,
+  "currency": "CNY",
+  "pay_method": "在线支付（微信）",
+  "items": [
+    {
+      "sku": "SKU-B001",
+      "name": "声动 Air 真无线降噪耳机",
+      "price": 799.0,
+      "qty": 1,
+      "subtotal": 799.0
+    }
+  ],
+  "carrier": "顺丰速运",
+  "carrier_phone": "95338",
+  "tracking_no": "SF202603050925",
+  "estimated_delivery": null,
+  "address": "深圳市南山区科苑南路 2666 号 5 栋 801",
+  "timeline": [
+    {
+      "at": "2026-03-05 16:55",
+      "text": "订单创建，等待付款",
+      "type": "order"
+    },
+    {
+      "at": "2026-03-05 17:07",
+      "text": "支付成功",
+      "type": "order"
+    },
+    {
+      "at": "2026-03-06 19:55",
+      "text": "顺丰速运 已揽收，运单号 SF202603050925",
+      "type": "ship"
+    },
+    {
+      "at": "2026-03-07 01:55",
+      "text": "已从【发货仓】发出",
+      "type": "ship"
+    },
+    {
+      "at": "2026-03-08 01:55",
+      "text": "到达【区域分拨中心】",
+      "type": "ship"
+    },
+    {
+      "at": "2026-03-09 01:55",
+      "text": "到达【城市转运中心】",
+      "type": "ship"
+    },
+    {
+      "at": "2026-03-10 01:55",
+      "text": "派送中，配送员正在为您派送",
+      "type": "ship"
+    },
+    {
+      "at": "2026-03-09 00:00",
+      "text": "订单完成（已过售后期）",
+      "type": "ok"
+    }
+  ],
+  "after_sale": null,
+  "refund_eligible": false,
+  "refund_deadline": null,
+  "refund_note": "",
+  "available_actions": [
+    "apply_repair",
+    "apply_exchange",
+    "invoice_query"
+  ],
+  "available_action_labels": [
+    "申请维修",
+    "申请换货",
+    "查询发票"
+  ],
+  "internal_note": "在保（保修至 2027-03-10）"
+}

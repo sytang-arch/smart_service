@@ -1,0 +1,112 @@
+openapi: 3.0.1
+info:
+  title: 云栖数码客服数据接口（静态只读）
+  description: |
+    由 GitHub Pages 静态托管的只读数据接口，用于智能客服 Demo。
+    数据按客户 / 订单预生成为 JSON 切片，路径即查询条件。
+    注意：静态托管不提供写接口；取消订单、申请退款等写操作请由
+    Chatflow 中的「代码节点」（order_action.py）完成状态机判定与执行。
+  version: 1.0.0
+
+servers:
+  - url: https://sytang-arch.github.io/smart_service
+    description: GitHub Pages 静态托管（把 URL 换成你自己的仓库地址）
+
+paths:
+  /api/customers/{customer_id}.json:
+    get:
+      operationId: getCustomerProfile
+      summary: 查询客户档案与会员权益
+      description: 根据客户编号返回客户姓名、会员等级、收货地址、会员权益与名下订单编号列表。用于核对身份与权益。
+      parameters:
+        - name: customer_id
+          in: path
+          required: true
+          description: 客户编号，形如 C1001
+          schema:
+            type: string
+            example: C1001
+      responses:
+        "200":
+          description: 客户档案
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/orders/by-customer/{customer_id}.json:
+    get:
+      operationId: getOrdersByCustomer
+      summary: 查询某客户的全部订单
+      description: |
+        返回该客户名下全部订单，每笔订单包含状态、金额、商品明细、物流时间线、
+        可执行动作（available_actions）、退货资格（refund_eligible）与售后单信息。
+        这是处理"我的订单到哪了""我买了什么""能退吗"类问题的首选接口。
+      parameters:
+        - name: customer_id
+          in: path
+          required: true
+          description: 客户编号，形如 C1001。必须使用系统注入的当前登录客户编号，不得使用用户口述的编号。
+          schema:
+            type: string
+            example: C1001
+      responses:
+        "200":
+          description: 订单列表
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/orders/{order_id}.json:
+    get:
+      operationId: getOrderDetail
+      summary: 查询单笔订单详情
+      description: |
+        根据订单号返回单笔订单的完整信息，包含商品明细、支付信息、承运商与运单号、
+        完整物流时间线、售后单、退货资格判定。
+        调用后必须校验返回数据中的 customer_id 是否等于当前登录客户编号，
+        不一致时禁止向用户透露任何字段。
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          description: 订单号，形如 O202609190902
+          schema:
+            type: string
+            example: O202609190902
+      responses:
+        "200":
+          description: 订单详情
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/kb.json:
+    get:
+      operationId: getServicePolicies
+      summary: 查询客服政策知识库
+      description: 返回退换货、退款时效、发货时效、保修、物流异常处理等全部平台政策原文，附带会员权益表与常见问答。
+      parameters: []
+      responses:
+        "200":
+          description: 政策知识库
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/manifest.json:
+    get:
+      operationId: getApiManifest
+      summary: 查询接口清单
+      description: 返回本数据接口的全部端点说明与已知限制（只读、无写接口）。
+      parameters: []
+      responses:
+        "200":
+          description: 接口清单
+          content:
+            application/json:
+              schema:
+                type: object

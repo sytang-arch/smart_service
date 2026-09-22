@@ -1,0 +1,73 @@
+{
+  "order_id": "O202609150907",
+  "customer_id": "C1002",
+  "status": "in_transit",
+  "status_label": "运输中",
+  "created_at": "2026-09-15 16:49",
+  "paid_at": "2026-09-15 17:01",
+  "shipped_at": "2026-09-16 19:49",
+  "signed_at": null,
+  "completed_at": null,
+  "amount": 1299.0,
+  "currency": "CNY",
+  "pay_method": "在线支付（微信）",
+  "items": [
+    {
+      "sku": "SKU-B002",
+      "name": "声动 Studio 头戴式降噪耳机",
+      "price": 1299.0,
+      "qty": 1,
+      "subtotal": 1299.0
+    }
+  ],
+  "carrier": "顺丰速运",
+  "carrier_phone": "95338",
+  "tracking_no": "SF202609150907",
+  "estimated_delivery": "2026-09-19",
+  "address": "北京市海淀区中关村大街 27 号 A 座 1801",
+  "timeline": [
+    {
+      "at": "2026-09-15 16:49",
+      "text": "订单创建，等待付款",
+      "type": "order"
+    },
+    {
+      "at": "2026-09-15 17:01",
+      "text": "支付成功",
+      "type": "order"
+    },
+    {
+      "at": "2026-09-16 19:49",
+      "text": "顺丰速运 已揽收，运单号 SF202609150907",
+      "type": "ship"
+    },
+    {
+      "at": "2026-09-17 01:49",
+      "text": "已从【发货仓】发出",
+      "type": "ship"
+    },
+    {
+      "at": "2026-09-18 01:49",
+      "text": "到达【区域分拨中心】",
+      "type": "ship"
+    },
+    {
+      "at": "2026-09-19 01:49",
+      "text": "到达【城市转运中心】",
+      "type": "ship"
+    }
+  ],
+  "after_sale": null,
+  "refund_eligible": false,
+  "refund_deadline": null,
+  "refund_note": "",
+  "available_actions": [
+    "track_logistics",
+    "report_logistics_exception"
+  ],
+  "available_action_labels": [
+    "查询物流",
+    "申报物流异常"
+  ],
+  "internal_note": ""
+}

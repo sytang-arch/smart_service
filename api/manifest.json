@@ -1,0 +1,33 @@
+{
+  "name": "云栖数码客服 Demo 静态数据接口",
+  "version": "1.0.0",
+  "note": "只读静态接口。由 GitHub Pages / 任意静态托管直接提供，Dify 自定义工具可原样调用。",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/api/customers.json",
+      "desc": "全部客户档案"
+    },
+    {
+      "method": "GET",
+      "path": "/api/customers/{customer_id}.json",
+      "desc": "单个客户档案与会员权益"
+    },
+    {
+      "method": "GET",
+      "path": "/api/orders/by-customer/{customer_id}.json",
+      "desc": "某客户的全部订单（含物流时间线与可执行动作）"
+    },
+    {
+      "method": "GET",
+      "path": "/api/orders/{order_id}.json",
+      "desc": "单个订单详情"
+    },
+    {
+      "method": "GET",
+      "path": "/api/kb.json",
+      "desc": "客服政策知识库"
+    }
+  ],
+  "limitation": "静态托管不提供写接口。取消订单 / 申请退款等写操作由 Dify 代码节点状态机在会话内完成，生产环境应替换为真实后端。"
+}

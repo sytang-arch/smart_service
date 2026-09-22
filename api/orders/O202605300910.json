@@ -1,0 +1,85 @@
+{
+  "order_id": "O202605300910",
+  "customer_id": "C1002",
+  "status": "completed",
+  "status_label": "已完成",
+  "created_at": "2026-05-30 10:10",
+  "paid_at": "2026-05-30 10:22",
+  "shipped_at": "2026-05-31 13:10",
+  "signed_at": null,
+  "completed_at": "2026-06-03 00:00",
+  "amount": 329.0,
+  "currency": "CNY",
+  "pay_method": "在线支付（支付宝）",
+  "items": [
+    {
+      "sku": "SKU-G001",
+      "name": "穿墙 AX3000 双频路由器",
+      "price": 329.0,
+      "qty": 1,
+      "subtotal": 329.0
+    }
+  ],
+  "carrier": "中通快递",
+  "carrier_phone": "95311",
+  "tracking_no": "ZTO202605300910",
+  "estimated_delivery": null,
+  "address": "北京市海淀区中关村大街 27 号 A 座 1801",
+  "timeline": [
+    {
+      "at": "2026-05-30 10:10",
+      "text": "订单创建，等待付款",
+      "type": "order"
+    },
+    {
+      "at": "2026-05-30 10:22",
+      "text": "支付成功",
+      "type": "order"
+    },
+    {
+      "at": "2026-05-31 13:10",
+      "text": "中通快递 已揽收，运单号 ZTO202605300910",
+      "type": "ship"
+    },
+    {
+      "at": "2026-05-31 19:10",
+      "text": "已从【发货仓】发出",
+      "type": "ship"
+    },
+    {
+      "at": "2026-06-01 19:10",
+      "text": "到达【区域分拨中心】",
+      "type": "ship"
+    },
+    {
+      "at": "2026-06-02 19:10",
+      "text": "到达【城市转运中心】",
+      "type": "ship"
+    },
+    {
+      "at": "2026-06-03 19:10",
+      "text": "派送中，配送员正在为您派送",
+      "type": "ship"
+    },
+    {
+      "at": "2026-06-03 00:00",
+      "text": "订单完成（已过售后期）",
+      "type": "ok"
+    }
+  ],
+  "after_sale": null,
+  "refund_eligible": false,
+  "refund_deadline": null,
+  "refund_note": "",
+  "available_actions": [
+    "apply_repair",
+    "apply_exchange",
+    "invoice_query"
+  ],
+  "available_action_labels": [
+    "申请维修",
+    "申请换货",
+    "查询发票"
+  ],
+  "internal_note": ""
+}
