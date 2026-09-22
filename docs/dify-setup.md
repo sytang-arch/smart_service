@@ -386,6 +386,22 @@ node server/index.js
 两条都填也可以：页面会优先用代理，代理不可用时自动切到 iframe，
 再不行才落到规则兜底。**API Key 永远只放服务端的 Secret，不放前端。**
 
+**Cloudflare Worker 怎么部署（全程网页点，不用命令行）**
+
+1. <https://dash.cloudflare.com/> → Workers & Pages → Create → Worker
+2. 把 `server/worker.js` 全部内容粘进在线编辑器 → Deploy
+3. Settings → Variables and Secrets 加三个变量 → 再 Deploy 一次
+
+| 变量名 | 值 | 类型 |
+| --- | --- | --- |
+| `DIFY_API_KEY` | `app-xxxx` | **Secret（加密）** |
+| `ALLOWED_ORIGIN` | `https://sytang-arch.github.io` | Text |
+| `DIFY_API_BASE` | `https://api.dify.ai/v1` | Text |
+
+> ⚠️ `ALLOWED_ORIGIN` 是**必填的安全项**，不要留空或填 `*`。
+> Dify 的 `/v1` 接口 CORS 是放开的（会回显请求方域名），所以"靠 Dify 自己挡"这条路不通；
+> 挡人的责任在中转服务上。访问 `/api/health` 看 `cors_locked` 是否为 `true`。
+
 ---
 
 ## 验收清单（8 条）
@@ -423,6 +439,13 @@ node server/index.js
 | 模型每次都输出 ```json 包裹 | 提示词约束不够强 | 在意图识别提示词末尾加："只输出 JSON 对象本身，禁止使用 markdown 代码块" |
 | 跨客户订单没被拦住 | 代码节点没接上，Agent 直接回答 | 检查 `售后判定` 是否在链路上（这是最容易漏的一步） |
 | 页面连不上 Dify，报 CORS | 前端直连了 Dify | 必须走代理。浏览器的请求只发往 `/api/dify/chat` |
+| Worker 返回 403「来源不在白名单内」 | 页面域名没写进 `ALLOWED_ORIGIN` | 把实际访问的域名（含 `https://`）加进去，多个用英文逗号分隔，改完重新 Deploy |
+| 别人拿你的 Worker 刷额度 | `ALLOWED_ORIGIN` 留空或写成 `*` | 立刻改成白名单。CORS 放开时请求照样打到 Dify、照样扣费，浏览器只拦"读响应"不拦"发请求" |
+
+> **为什么不能把 Key 直接写进前端？** 前端文件随 Pages 一起公开，Key 就等于公开，
+> 任何打开页面的人都能拿它调你的应用、消耗你的额度；而且 Dify 的 `/v1` CORS 是放开的，
+> 连"加域名白名单"这条补救路都没有。**静态页面要实时调 LLM，Key 只有两个去处：
+> 页面里（公开）或中转服务里（安全）。这个仓库选的是后者。**
 
 ---
 

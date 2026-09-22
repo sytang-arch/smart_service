@@ -110,6 +110,27 @@ node server/index.js
 > 部署完记得确认：Dify 应用里点过 **发布**，否则 API 会返回
 > `{"code":"invalid_param","message":"Workflow not published"}`。
 
+#### 部署 Worker 代理（网页操作，不用装任何工具）
+
+1. 打开 <https://dash.cloudflare.com/> → **Workers & Pages** → **Create** → **Worker**；
+2. 把 [`server/worker.js`](server/worker.js) 的**全部内容**粘进在线编辑器，**Deploy**；
+3. 进 **Settings → Variables and Secrets**，加三个变量后**再 Deploy 一次**：
+
+| 变量名 | 值 | 类型 |
+| --- | --- | --- |
+| `DIFY_API_KEY` | 你的 `app-xxxx` | **Secret（加密）** |
+| `ALLOWED_ORIGIN` | `https://sytang-arch.github.io` | Text |
+| `DIFY_API_BASE` | `https://api.dify.ai/v1` | Text |
+
+4. 把 Worker 域名填进 `assets/js/config.js` 的 `API_BASE`。
+
+> ⚠️ **`ALLOWED_ORIGIN` 不要留空、更不要填 `*`。** 这个 Worker 手里握着能花钱的 Key，
+> CORS 放开等于给所有人一个免费代理——浏览器会拦住"读响应"，但请求照样打到 Dify、照样扣费。
+> 访问 `https://<你的worker>/api/health`，看 `cors_locked` 是否为 `true` 即可确认。
+>
+> 想验证拦截是否生效：`curl -H "Origin: https://evil.example.com" -H "Content-Type: application/json" -d '{"query":"hi"}' https://<你的worker>/api/dify/chat`
+> —— 应返回 403。
+
 ---
 
 ## 目录结构

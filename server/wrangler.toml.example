@@ -1,7 +1,14 @@
 # Cloudflare Worker 配置示例
-# 用法：复制为 wrangler.toml，把 name 改成你自己的，然后
+#
+# 【方式一】命令行部署：复制本文件为 wrangler.toml，然后
 #   wrangler secret put DIFY_API_KEY
 #   wrangler deploy
+#
+# 【方式二】网页控制台部署（不用装任何东西）：
+#   dash.cloudflare.com → Workers & Pages → Create → Worker
+#   把 server/worker.js 的全部内容粘进在线编辑器 → Deploy
+#   再到 Settings → Variables and Secrets 添加下面三个变量 → 重新 Deploy
+#   注意 DIFY_API_KEY 的类型要选 Secret（加密），另外两个选 Text
 
 name = "smart-service-proxy"
 main = "worker.js"
@@ -10,5 +17,14 @@ compatibility_date = "2025-01-01"
 # 非密钥配置写在这里；DIFY_API_KEY 必须用 wrangler secret put 设置
 [vars]
 DIFY_API_BASE = "https://api.dify.ai/v1"
-DIFY_IDENTITY_MODE = "inputs"
+
+# auto = 先「输入变量 + 前缀」，被 Dify 拒了自动降级为「仅前缀」（推荐）
+DIFY_IDENTITY_MODE = "auto"
+
 DIFY_APP_NAME = "云栖智能客服 Agent"
+
+# ★ 必填，且不要设成 "*"
+# 这个 Worker 手里握着能花钱的 API Key，CORS 放开等于给所有人一个免费代理，
+# 别人可以拿它刷你的 Dify 额度。多个域名用英文逗号分隔。
+# 例：ALLOWED_ORIGIN = "https://sytang-arch.github.io,http://localhost:8787"
+ALLOWED_ORIGIN = "https://sytang-arch.github.io"
