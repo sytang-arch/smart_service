@@ -129,11 +129,20 @@ smart_service/
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
+| GET | `/api/customers.json` | 全部客户档案 |
+| GET | `/api/orders.json` | 全部订单 |
+| GET | `/api/products.json` | 全部商品 |
 | GET | `/api/customers/{customer_id}.json` | 客户档案与会员权益 |
 | GET | `/api/orders/by-customer/{customer_id}.json` | 某客户全部订单 |
 | GET | `/api/orders/{order_id}.json` | 单笔订单详情 |
 | GET | `/api/kb.json` | 政策知识库 |
 | GET | `/api/manifest.json` | 接口清单与限制 |
+
+前端读 `api/*.json`；读取失败（例如直接以 `file://` 打开页面）会自动回落到
+`assets/js/data.bundle.js`，离线也能完整演示。
+
+> 给 Dify 的 OpenAPI 工具定义里**只暴露 5 个细粒度端点**（按客户查、按订单查、客户档案、政策、清单），
+> 不暴露"全量订单"这类粗接口 —— 给 Agent 的工具应该少而准，不是越多越好。
 
 **模拟数据规模**：6 位客户（4 个会员等级全覆盖）/ 30 笔订单（8 种状态全覆盖）/ 12 个商品 / 8 条政策。
 

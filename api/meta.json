@@ -1,0 +1,37 @@
+{
+  "demo_name": "云栖数码 · 智能客服 Demo",
+  "scenario": "数码 3C 电商在线客服",
+  "data_as_of": "2026-09-22",
+  "customers": 6,
+  "orders": 30,
+  "products": 12,
+  "status_legend": {
+    "pending_payment": "待付款",
+    "paid": "待发货（已付款）",
+    "shipped": "已发货",
+    "in_transit": "运输中",
+    "delivered": "已签收",
+    "completed": "已完成",
+    "cancelled": "已取消",
+    "after_sale": "售后处理中",
+    "refunded": "已退款"
+  },
+  "action_legend": {
+    "cancel_order": "取消订单",
+    "pay_reminder": "获取支付链接",
+    "urge_shipping": "催发货",
+    "track_logistics": "查询物流",
+    "report_logistics_exception": "申报物流异常",
+    "apply_refund": "申请退款",
+    "apply_exchange": "申请换货",
+    "apply_repair": "申请维修",
+    "invoice_query": "查询发票",
+    "reorder": "再次购买",
+    "query_after_sale": "查看售后进度"
+  },
+  "rules": {
+    "no_reason_return_days": 7,
+    "quality_exchange_days": 15,
+    "warranty_months": 12
+  }
+}

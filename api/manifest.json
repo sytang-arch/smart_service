@@ -10,6 +10,16 @@
     },
     {
       "method": "GET",
+      "path": "/api/orders.json",
+      "desc": "全部订单（演示规模下可整体返回）"
+    },
+    {
+      "method": "GET",
+      "path": "/api/products.json",
+      "desc": "全部商品"
+    },
+    {
+      "method": "GET",
       "path": "/api/customers/{customer_id}.json",
       "desc": "单个客户档案与会员权益"
     },

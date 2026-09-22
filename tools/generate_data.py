@@ -449,6 +449,8 @@ def main():
         "note": "只读静态接口。由 GitHub Pages / 任意静态托管直接提供，Dify 自定义工具可原样调用。",
         "endpoints": [
             {"method": "GET", "path": "/api/customers.json", "desc": "全部客户档案"},
+            {"method": "GET", "path": "/api/orders.json", "desc": "全部订单（演示规模下可整体返回）"},
+            {"method": "GET", "path": "/api/products.json", "desc": "全部商品"},
             {"method": "GET", "path": "/api/customers/{customer_id}.json", "desc": "单个客户档案与会员权益"},
             {"method": "GET", "path": "/api/orders/by-customer/{customer_id}.json", "desc": "某客户的全部订单（含物流时间线与可执行动作）"},
             {"method": "GET", "path": "/api/orders/{order_id}.json", "desc": "单个订单详情"},
@@ -456,7 +458,10 @@ def main():
         ],
         "limitation": "静态托管不提供写接口。取消订单 / 申请退款等写操作由 Dify 代码节点状态机在会话内完成，生产环境应替换为真实后端。",
     })
+    wjson(os.path.join(API_DIR, "meta.json"), meta)
     wjson(os.path.join(API_DIR, "customers.json"), customers)
+    wjson(os.path.join(API_DIR, "orders.json"), orders)
+    wjson(os.path.join(API_DIR, "products.json"), products)
     for c in customers:
         cid = c["customer_id"]
         wjson(os.path.join(API_DIR, "customers", cid + ".json"), {
@@ -491,6 +496,32 @@ def main():
     print("OK customers=%d orders=%d products=%d" % (len(customers), len(orders), len(products)))
     print("api files written under api/")
     print("offline bundle written to assets/js/data.bundle.js")
+    verify()
+
+
+def verify():
+    """自检：前端固定会请求这几个文件，缺一个就会静默回落到兜底数据包。
+
+    曾经因为没有产出 api/meta.json，前端在"静态 API 模式"下其实一直走着兜底数据 ——
+    页面看起来正常，但 API 链路从没跑通过。这类"静默降级"最难发现，所以加一道硬断言。
+    """
+    required = [
+        "data/meta.json", "data/customers.json", "data/products.json",
+        "data/orders.json", "data/kb.json",
+        "api/meta.json", "api/manifest.json", "api/customers.json",
+        "api/orders.json", "api/products.json", "api/kb.json",
+        "api/customers/C1001.json", "api/customers/C1006.json",
+        "api/orders/by-customer/C1001.json", "api/orders/by-customer/C1006.json",
+        "assets/js/data.bundle.js",
+    ]
+    missing = [r for r in required if not os.path.isfile(os.path.join(ROOT, r.replace("/", os.sep)))]
+    if missing:
+        raise SystemExit("自检失败，以下文件未生成：\n  " + "\n  ".join(missing))
+
+    bundle = open(os.path.join(JS_DIR, "data.bundle.js"), encoding="utf-8").read()
+    if "window.CS_DATA" not in bundle:
+        raise SystemExit("自检失败：离线数据包格式不对")
+    print("自检通过：%d 个必需文件齐全，前端接口链路可完整跑通" % len(required))
 
 
 if __name__ == "__main__":

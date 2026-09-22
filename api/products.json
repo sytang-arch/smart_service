@@ -1,0 +1,74 @@
+[
+  {
+    "sku": "SKU-A001",
+    "name": "星耀 X1 Pro 智能手机 256GB",
+    "price": 4999.0,
+    "category": "手机"
+  },
+  {
+    "sku": "SKU-A002",
+    "name": "星耀 X1 智能手机 128GB",
+    "price": 3299.0,
+    "category": "手机"
+  },
+  {
+    "sku": "SKU-B001",
+    "name": "声动 Air 真无线降噪耳机",
+    "price": 799.0,
+    "category": "音频"
+  },
+  {
+    "sku": "SKU-B002",
+    "name": "声动 Studio 头戴式降噪耳机",
+    "price": 1299.0,
+    "category": "音频"
+  },
+  {
+    "sku": "SKU-C001",
+    "name": "云阅 11 英寸平板电脑",
+    "price": 2699.0,
+    "category": "平板"
+  },
+  {
+    "sku": "SKU-C002",
+    "name": "云阅平板磁吸键盘保护套",
+    "price": 399.0,
+    "category": "配件"
+  },
+  {
+    "sku": "SKU-D001",
+    "name": "轻风 14 英寸轻薄笔记本",
+    "price": 5499.0,
+    "category": "电脑"
+  },
+  {
+    "sku": "SKU-E001",
+    "name": "极速 65W 氮化镓充电器",
+    "price": 149.0,
+    "category": "配件"
+  },
+  {
+    "sku": "SKU-E002",
+    "name": "耐力 20000mAh 移动电源",
+    "price": 219.0,
+    "category": "配件"
+  },
+  {
+    "sku": "SKU-F001",
+    "name": "律动 Watch S2 智能手表",
+    "price": 1099.0,
+    "category": "穿戴"
+  },
+  {
+    "sku": "SKU-G001",
+    "name": "穿墙 AX3000 双频路由器",
+    "price": 329.0,
+    "category": "网络"
+  },
+  {
+    "sku": "SKU-H001",
+    "name": "视界 27 英寸 2K 显示器",
+    "price": 1399.0,
+    "category": "显示"
+  }
+]
