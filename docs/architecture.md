@@ -27,9 +27,12 @@
 └──────────────────────────┘                 ▼
                           ┌────────────────────────────────────┐
                           │  智能层  Dify Chatflow              │
-                          │  意图识别 → HTTP 查订单             │
-                          │           → 代码节点（身份+状态机）  │
-                          │           → 回复生成 / 知识检索      │
+                          │  意图识别 → 路由（条件分支）         │
+                          │    ├─ 含 policy → 知识检索          │
+                          │    │              → 政策回复         │
+                          │    └─ 其它 → HTTP 查「该客户全部订单」│
+                          │             → 代码节点（三道闸）      │
+                          │             → 回复生成               │
                           └────────────────────────────────────┘
 ```
 
@@ -54,13 +57,14 @@
    ├─▶ Dify Chatflow
    │        1. 开始节点接收 inputs → customer_id = C1001
    │        2. 意图识别 LLM → {"intent":"cancel_order","order_id":"O202609190902"}
-   │        3. HTTP 节点 GET /api/orders/O202609190902.json
-   │               → 拿到订单（customer_id = C1001，status = paid）
-   │        4. 代码节点 order_action.py
-   │               · order.customer_id == C1001 ？✅
-   │               · paid 状态允许 cancel_order ？✅
+   │        3. 路由（条件分支）→ 不含 policy，走 ELSE 支路
+   │        4. HTTP 节点 GET /api/orders/by-customer/C1001.json
+   │               → 拿到「C1001 的全部订单」；别人的订单根本不在这个结果里
+   │        5. 代码节点 order_action.py
+   │               · 在 C1001 的订单里找 O202609190902 → ✅ 找到，status = paid
+   │               · paid 状态允许 cancel_order → ✅
    │               → { ok: true, status_after: "cancelled", ticket_id: "AS09190902-CANC" }
-   │        5. 回复生成 LLM → 把 JSON 翻译成人话
+   │        6. 回复生成 LLM → 把 JSON 翻译成人话
    │
    ├─▶ 代理把 SSE 流原样回传
    │
@@ -74,13 +78,14 @@
 | 风险 | 防御手段 | 为什么不能用提示词解决 |
 | --- | --- | --- |
 | 模型编造订单号/金额/物流 | 所有事实只能来自 HTTP 节点返回的 JSON；回复节点提示词明确禁止补充 | 提示词是"软约束"，长对话里必然漂移；结构化数据是"硬约束" |
-| 越权查别人订单 | 代码节点比对 `order.customer_id` 与系统注入的 `customer_id`，不一致直接拒绝**且不回显任何字段** | 模型会"好心"帮忙；且回显本身即泄露 |
+| 越权查别人订单 | HTTP 节点按系统注入的 `customer_id` 取数，**别人的订单压根不在返回结果里**；代码节点再做一次归属校验 | 模型会"好心"帮忙；且回显本身即泄露 |
 | 用户自称是别人 | 身份只从 Dify `inputs` 注入，对话内容不参与身份判定 | 提示注入可以伪造任何自称 |
 | API Key 泄露 | Key 只存在代理进程环境变量；浏览器只访问同源 `/api/dify/chat` | 前端任何密钥 F12 即得 |
 | 非法状态操作 | 代码节点状态机查表（`ALLOWED`），非法直接 `ok=false` | 模型不擅长稳定执行规则表 |
 
-**一个刻意的设计**：越权时连"这个订单存在"都不透露。
-很多实现会回"该订单不属于您，订单金额 4999 元"——这已经泄露了信息。
+**一个刻意的设计**：查到不属于自己的单号时，回答是「您的账户下没有找到该订单」——
+**措辞与"这个单号根本不存在"完全一致**。如果说"这不是您的订单"，等于承认这个单号是存在的，
+本身就又泄露了一条信息。很多实现会回"该订单不属于您，金额 4999 元"，那泄露得更多。
 
 ---
 
@@ -93,7 +98,7 @@
 | GET | `/api/customers.json` | 全部客户档案 |
 | GET | `/api/customers/{customer_id}.json` | 单客户档案 + 会员权益 |
 | GET | `/api/orders/by-customer/{customer_id}.json` | 该客户全部订单 |
-| GET | `/api/orders/{order_id}.json` | 单笔订单详情 |
+| GET | `/api/orders/{order_id}.json` | 单笔订单详情（**Dify 流程刻意不用它**，理由见 [dify-setup.md 第 5 步](dify-setup.md)） |
 | GET | `/api/kb.json` | 政策知识库 |
 | GET | `/api/manifest.json` | 接口清单与已知限制 |
 

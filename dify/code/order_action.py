@@ -1,23 +1,23 @@
 # =============================================================================
-# Dify 代码节点：售后动作判定与执行
-# =============================================================================
-# 放在 Chatflow 的「代码节点」里，输入变量：
-#   customer_id  string  系统注入的当前登录客户编号（不可来自用户口述）
-#   action       string  来自意图识别节点，取值见 ACTIONS
-#   order_json   string  上游「HTTP 请求节点」返回的单笔订单 JSON 文本
-#   today        string  可选，演示基准日，默认 2026-09-22（与数据基准一致）
+# Dify 代码节点「售后判定」   文件位置：dify/code/order_action.py
+# -----------------------------------------------------------------------------
+# 输入变量（共 5 个，变量名必须与下面 main() 的参数逐字一致）：
+#   customer_id       String  来自「开始」节点 —— 服务端注入的登录身份
+#   action            String  来自「意图识别」节点 —— 整段意图 JSON 文本
+#   orders_json       String  来自「查询客户订单」HTTP 节点 —— 该客户的订单列表
+#   current_order_id  String  来自「开始」节点 —— 页面上正在查看的订单（可为空）
+#   today             String  常量 —— 演示基准日 2026-09-22
 #
-# 输出变量：
-#   ok            bool    操作是否被允许
-#   status_after  string  操作后的订单状态
-#   ticket_id     string  生成的售后单号（无则空串）
-#   message       string  给客户看的一句话结果
-#   suggest       string  被拒时的替代方案
-#   result_json   string  完整结构化结果，喂给下游「回复生成」LLM 节点
+# 输出变量（共 6 个，必须在节点里逐个声明）：
+#   ok / status_after / ticket_id / message / suggest / result_json
 #
-# 设计说明：静态数据接口是只读的，所以"写操作"不在数据侧落库，而是在这里
-# 做一次真实的规则判定 + 生成售后单号，交给前端与 Agent 会话共同维护状态。
-# 这就是 demo 的边界，也是替换成真实后端时唯一需要改的地方。
+# 设计要点：
+#   1. 订单只在「该客户自己的订单集合」里查找 —— 越权在数据边界上就不可能发生。
+#      函数内仍会再校验一次 customer_id，作为第二道闸（纵深防御）。
+#   2. 写操作不落库（静态托管不提供写接口），由本节点做真实的规则判定并生成售后单号。
+#      替换成真实后端时，只需把这一步换成 HTTP 调用，其余节点不用动。
+#   3. 状态机口径与 tools/generate_data.py 的 STATUS_ACTIONS 保持一致
+#      （只读动作如 track_logistics / pay_reminder / reorder 不在此列）。
 # =============================================================================
 
 import json
@@ -26,7 +26,7 @@ NO_REASON_RETURN_DAYS = 7       # 7 天无理由退货
 QUALITY_EXCHANGE_DAYS = 15      # 15 天质量问题换货
 WARRANTY_MONTHS = 12            # 1 年质保
 
-# 各订单状态允许的写操作
+# 各订单状态允许的写操作 —— 这是本项目最核心的一张表
 ALLOWED = {
     "pending_payment": ["cancel_order"],
     "paid": ["cancel_order", "urge_shipping"],
@@ -39,13 +39,34 @@ ALLOWED = {
     "refunded": [],
 }
 
+# 可以直接作为 action 传入的枚举值
 ACTIONS = [
     "cancel_order", "apply_refund", "apply_exchange", "apply_repair",
     "urge_shipping", "report_logistics_exception", "invoice_query", "query_after_sale",
 ]
 
-# 与订单状态无关、任何状态都可执行的动作
+# 与订单状态无关、任何状态都可执行的只读动作
 ALWAYS_ALLOWED = ["invoice_query", "query_after_sale"]
+
+# 两个只读查询在内部使用的伪动作
+LIST = "__list__"
+LOGISTICS = "__logistics__"
+
+# 意图节点输出的 intent -> 本节点的 action
+# 两边枚举故意不同：intent 描述"用户想干什么"，action 描述"系统要执行什么"。
+# 这份映射内建在代码里，所以不需要在 Dify 里做任何额外处理。
+INTENT_TO_ACTION = {
+    "cancel_order": "cancel_order",
+    "refund": "apply_refund",
+    "exchange": "apply_exchange",
+    "repair": "apply_repair",
+    "urge_shipping": "urge_shipping",
+    "logistics_exception": "report_logistics_exception",
+    "invoice": "invoice_query",
+    "after_sale": "query_after_sale",
+    "query_order": LIST,
+    "query_logistics": LOGISTICS,
+}
 
 ACTION_LABEL = {
     "cancel_order": "取消订单",
@@ -58,7 +79,7 @@ ACTION_LABEL = {
     "query_after_sale": "查看售后进度",
 }
 
-# 被拒时的替代方案
+# 被拒时给出的替代方案
 SUGGEST = {
     "cancel_order": "已发货订单无法取消。您可以在签收后 7 天内申请无理由退货，或在派送时选择拒收。",
     "apply_refund": "已超出 7 天无理由退货期。如果是质量问题，15 天内可申请换货，1 年内可走质保维修。",
@@ -67,143 +88,237 @@ SUGGEST = {
 }
 
 
-def _mk_ticket(order_id, action):
-    return "AS" + str(order_id)[-8:] + "-" + action[:4].upper()
+# ------------------------------------------------------------------ 小工具 ----
+def _name(o):
+    items = o.get("items") or []
+    return (items[0].get("name") if items else None) or "该商品"
 
 
-def _fail(message, suggest=""):
+def _brief(o):
+    """列表视图只给必要字段，避免把地址、内部备注等无关信息塞给模型。"""
     return {
-        "ok": False,
-        "status_after": "",
-        "ticket_id": "",
-        "message": message,
-        "suggest": suggest,
-        "result_json": json.dumps({
-            "ok": False, "message": message, "suggest": suggest,
-        }, ensure_ascii=False),
+        "order_id": o.get("order_id"),
+        "item": _name(o),
+        "status_label": o.get("status_label"),
+        "amount": o.get("amount"),
+        "created_at": o.get("created_at"),
+        "can_do": o.get("available_action_labels") or [],
     }
 
 
-def main(customer_id: str, action: str, order_json: str, today: str = "2026-09-22") -> dict:
-    # ---- 0. 解析入参 ----------------------------------------------------
-    action = (action or "").strip()
-    try:
-        order = json.loads(order_json) if order_json else {}
-    except Exception:
-        return _fail("查询接口返回的数据无法解析，请稍后重试。")
+def _reply(ok, message, suggest="", status_after="", ticket_id="", extra=None):
+    body = {"ok": ok, "message": message}
+    if suggest:
+        body["suggest"] = suggest
+    if extra:
+        body.update(extra)
+    return {
+        "ok": ok,
+        "status_after": status_after,
+        "ticket_id": ticket_id,
+        "message": message,
+        "suggest": suggest,
+        "result_json": json.dumps(body, ensure_ascii=False),
+    }
 
-    if not order or not order.get("order_id"):
-        return _fail("没有拿到订单信息。请先告诉我订单号，或者我按您的账户列出全部订单供您确认。")
+
+def _fail(message, suggest="", reason=""):
+    return _reply(False, message, suggest, extra={"reason": reason} if reason else None)
+
+
+def _locate(mine, want_oid, ok_status=None):
+    """在客户自己的订单里定位目标订单；找不到返回 None。"""
+    if want_oid:
+        w = str(want_oid).strip().upper()
+        for o in mine:
+            if str(o.get("order_id", "")).upper() == w:
+                return o
+        return None
+    for o in mine:
+        if ok_status is None or o.get("status") in ok_status:
+            return o
+    return None
+
+
+# ----------------------------------------------------------------- 主函数 ----
+def main(customer_id: str, action: str, orders_json: str = "",
+         current_order_id: str = "", today: str = "2026-09-22") -> dict:
+
+    customer_id = (customer_id or "").strip()
+    if not customer_id:
+        return _fail("没有拿到您的账户信息，请刷新页面后重新发起对话。", reason="NO_IDENTITY")
+
+    # ---- 0. 解析 action：既接受整段意图 JSON，也接受裸枚举 -------------------
+    intent, payload = "", {}
+    raw = (action or "").strip()
+    if raw.startswith("{"):
+        try:
+            payload = json.loads(raw)
+        except Exception:
+            payload = {}
+        intent = str(payload.get("intent") or "").strip()
+    if not intent:
+        intent = raw
+    act = INTENT_TO_ACTION.get(intent, intent)
+
+    # 目标订单号：用户当场说的（意图里抽出来的）优先，其次才是页面上正在看的那笔
+    want_oid = str(payload.get("order_id") or "").strip() or (current_order_id or "").strip()
+
+    # ---- 1. 解析订单集合 ----------------------------------------------------
+    try:
+        data = json.loads(orders_json) if orders_json else {}
+    except Exception:
+        return _fail("订单查询接口返回的数据无法解析，请稍后重试。", reason="BAD_PAYLOAD")
+
+    rows = data.get("orders") if isinstance(data, dict) else data
+    if not isinstance(rows, list):
+        rows = []
+
+    # 第一道闸：只在当前客户自己的订单里工作
+    mine = [o for o in rows
+            if isinstance(o, dict) and str(o.get("customer_id")) == customer_id]
+    mine.sort(key=lambda o: str(o.get("created_at") or ""), reverse=True)
+
+    if not mine:
+        return _fail("您的账户下暂时没有订单记录。", reason="NO_ORDERS")
+
+    # ---- 2. 只读意图：列出订单 / 查物流 -------------------------------------
+    if act == LIST:
+        n = len(mine)
+        return _reply(True, "为您查到 %d 笔订单，按时间倒序。" % n, extra={
+            "mode": "order_list",
+            "count": n,
+            "orders": [_brief(o) for o in mine[:5]],
+            "truncated": n > 5,
+        })
+
+    if act == LOGISTICS:
+        # 优先给真正"在路上"的那笔，其次才是已签收的，最后才兜底到任意一笔
+        o = (_locate(mine, want_oid, ["shipped", "in_transit"])
+             or _locate(mine, want_oid, ["delivered"])
+             or _locate(mine, want_oid))
+        if o is None:
+            return _fail("您的账户下没有找到订单 %s。" % want_oid, reason="ORDER_NOT_IN_SCOPE")
+        tl = o.get("timeline") or []
+        return _reply(True, "订单 %s（%s）当前状态：%s。" % (
+            o.get("order_id"), _name(o), o.get("status_label")), extra={
+            "mode": "logistics",
+            "order_id": o.get("order_id"),
+            "item_name": _name(o),
+            "status_label": o.get("status_label"),
+            "carrier": o.get("carrier"),
+            "tracking_no": o.get("tracking_no"),
+            "estimated_delivery": o.get("estimated_delivery"),
+            "timeline": [{"at": t.get("at"), "text": t.get("text")} for t in tl[-5:]],
+        })
+
+    # ---- 3. 写操作：先定位订单 ----------------------------------------------
+    if act not in ACTIONS:
+        return _fail(
+            "我还不太确定您想做什么。可以说得更具体一些：查订单 / 查物流 / 取消 / 退款 / "
+            "换货 / 维修 / 催发货 / 发票 / 售后进度。",
+            reason="UNKNOWN_INTENT",
+        )
+
+    if want_oid:
+        order = _locate(mine, want_oid)
+        if order is None:
+            # 第二道闸。措辞与「订单不存在」完全一致 —— 不区分「不存在」和「不属于你」，
+            # 这样连"这个单号是存在的"这一位信息也不会泄露。
+            return _fail(
+                "您的账户下没有找到订单 %s。请核对订单号，或者告诉我您要处理哪一笔，"
+                "我把您的订单列给您。" % want_oid,
+                "为了保护账户隐私，我不会查询或操作他人订单。",
+                reason="ORDER_NOT_IN_SCOPE",
+            )
+    else:
+        order = _locate(mine, "", [s for s, acts in ALLOWED.items()
+                                   if act in acts or act in ALWAYS_ALLOWED])
+        if order is None:
+            return _fail("您的账户下没有处于可执行「%s」状态的订单。"
+                         % ACTION_LABEL.get(act, act), reason="NO_ELIGIBLE_ORDER")
+
+    # 第三道闸：冗余身份校验。正常接线时永远走不到，防的是将来有人改了数据源
+    if str(order.get("customer_id")) != customer_id:
+        return _fail(
+            "抱歉，这笔订单不属于当前账户，我无法查看或操作。",
+            "为了保护账户隐私，请不要尝试查询他人订单。",
+            reason="IDENTITY_MISMATCH",
+        )
 
     oid = order.get("order_id")
     status = order.get("status", "")
+    label = ACTION_LABEL.get(act, act)
 
-    # ---- 1. 身份校验：这是全流程最关键的一道闸 ---------------------------
-    if order.get("customer_id") != customer_id:
-        # 注意：不得回显该订单的任何业务字段
-        return {
-            "ok": False,
-            "status_after": "",
-            "ticket_id": "",
-            "message": "抱歉，订单 %s 不属于当前账户，我无法查看或操作。" % oid,
-            "suggest": "为了保护账户隐私，请不要尝试查询他人订单。如需处理您自己的订单，我可以按您的账户为您列出全部订单。",
-            "result_json": json.dumps({
-                "ok": False,
-                "reason": "IDENTITY_MISMATCH",
-                "message": "订单 %s 不属于当前账户，我无法查看或操作。" % oid,
-                "suggest": "为了保护账户隐私，请不要尝试查询他人订单。",
-                "leak_prevented": True,
-            }, ensure_ascii=False),
-        }
-
-    if action not in ACTIONS:
-        return _fail("没有识别出要执行的操作，请您再说明一下具体想做什么（取消 / 退款 / 换货 / 维修 / 催发货）。")
-
-    # ---- 2. 状态机校验 --------------------------------------------------
-    allowed = ALLOWED.get(status, [])
-    label = ACTION_LABEL.get(action, action)
-
-    if action not in allowed and action not in ALWAYS_ALLOWED:
+    # ---- 4. 状态机校验 ------------------------------------------------------
+    if act not in ALLOWED.get(status, []) and act not in ALWAYS_ALLOWED:
         return _fail(
             "订单 %s（%s）当前状态为「%s」，不支持「%s」。" % (
-                oid, (order.get("items") or [{}])[0].get("name", "商品"), order.get("status_label", status), label),
-            SUGGEST.get(action, "建议联系人工客服进一步处理。"),
+                oid, _name(order), order.get("status_label", status), label),
+            SUGGEST.get(act, "建议联系人工客服进一步处理。"),
+            reason="STATE_REJECTED",
         )
 
-    # ---- 3. 退货资格校验（只在申请退款时）--------------------------------
-    if action == "apply_refund":
-        if not order.get("refund_eligible"):
-            return _fail(
-                "订单 %s 的退货资格不满足：%s" % (oid, order.get("refund_note") or "已超出 7 天无理由退货期"),
-                SUGGEST["apply_refund"],
-            )
+    # ---- 5. 退货资格校验（只在申请退款时）-----------------------------------
+    if act == "apply_refund" and not order.get("refund_eligible"):
+        return _fail(
+            "订单 %s 的退货资格不满足：%s"
+            % (oid, order.get("refund_note") or "已超出 7 天无理由退货期"),
+            SUGGEST["apply_refund"],
+            reason="NOT_ELIGIBLE",
+        )
 
-    # ---- 4. 生成执行结果 -------------------------------------------------
+    # ---- 6. 生成执行结果 ----------------------------------------------------
     amount = order.get("amount", 0)
-    item_name = (order.get("items") or [{}])[0].get("name", "商品")
-    ticket = _mk_ticket(oid, action)
+    item = _name(order)
+    ticket = "AS" + str(oid)[-8:] + "-" + act[:4].upper()
+    status_after, suggest = status, ""
 
-    if action == "cancel_order":
-        message = "订单 %s（%s，￥%s）已取消，退款 %s 元原路退回，微信/支付宝 1-3 个工作日、银行卡 3-7 个工作日到账。" % (
-            oid, item_name, amount, amount)
+    if act == "cancel_order":
+        message = ("订单 %s（%s，%s 元）已取消，款项原路退回：微信/支付宝 1-3 个工作日、"
+                   "银行卡 3-7 个工作日到账。") % (oid, item, amount)
         status_after = "cancelled"
-        suggest = "如需重新购买，我可以为您生成同款订单草稿。"
-    elif action == "apply_refund":
-        message = "订单 %s（%s）的退款申请已提交，售后单号 %s，退款金额 %s 元，审核通过后 1-3 个工作日原路到账。" % (
-            oid, item_name, ticket, amount)
+        suggest = "如需重新购买，我可以为您生成同款订单。"
+    elif act == "apply_refund":
+        message = ("订单 %s（%s）的退款申请已提交，售后单号 %s，退款金额 %s 元，"
+                   "审核通过后 1-3 个工作日原路到账。") % (oid, item, ticket, amount)
         status_after = "after_sale"
         suggest = "请保持商品与包装完好，快递员上门取件时无需支付运费。"
-    elif action == "apply_exchange":
-        message = "订单 %s（%s）的换货申请已提交，售后单号 %s。请在 48 小时内寄回，往返运费由平台承担，收到后 24 小时内寄出换新机。" % (
-            oid, item_name, ticket)
+    elif act == "apply_exchange":
+        message = ("订单 %s（%s）的换货申请已提交，售后单号 %s。请在 48 小时内寄回，"
+                   "往返运费由平台承担，收到后 24 小时内寄出换新机。") % (oid, item, ticket)
         status_after = "after_sale"
         suggest = "寄回时请附上故障描述，便于仓库快速检测。"
-    elif action == "apply_repair":
-        message = "订单 %s（%s）的维修申请已受理，售后单号 %s，可顺丰到付寄修，7-15 个工作日完成。" % (
-            oid, item_name, ticket)
+    elif act == "apply_repair":
+        message = ("订单 %s（%s）的维修申请已受理，售后单号 %s，可顺丰到付寄修，"
+                   "7-15 个工作日完成。") % (oid, item, ticket)
         status_after = "after_sale"
         suggest = "请提供故障视频或照片，便于工程师预判问题。"
-    elif action == "urge_shipping":
+    elif act == "urge_shipping":
         message = "已为订单 %s 提交催发货工单，仓库将在 24 小时内优先处理。" % oid
-        status_after = status
         suggest = "普通会员 48 小时内发货，黄金及以上会员优先发货。"
-    elif action == "report_logistics_exception":
+    elif act == "report_logistics_exception":
         message = "已为订单 %s 发起物流异常核查，承运商承诺 24 小时内反馈结果。" % oid
-        status_after = status
         suggest = "若承运商确认丢件，可选择全额退款或补发。"
-    elif action == "invoice_query":
+    elif act == "invoice_query":
         message = "订单 %s 的电子发票已重新推送至您的下单邮箱。" % oid
-        status_after = status
         suggest = "如未收到请检查垃圾邮件目录。"
     else:  # query_after_sale
         af = order.get("after_sale") or {}
         if af:
-            message = "订单 %s 的售后单 %s 当前状态：%s。%s" % (oid, af.get("ticket_id"), af.get("status"), af.get("expect") or "")
+            message = "订单 %s 的售后单 %s 当前状态：%s。%s" % (
+                oid, af.get("ticket_id"), af.get("status"), af.get("expect") or "")
         else:
             message = "订单 %s 当前没有进行中的售后单。" % oid
-        status_after = status
-        suggest = ""
 
-    result = {
-        "ok": True,
-        "action": action,
+    return _reply(True, message, suggest, status_after, ticket, {
+        "action": act,
         "action_label": label,
         "order_id": oid,
-        "item_name": item_name,
+        "item_name": item,
         "amount": amount,
         "status_before": status,
         "status_after": status_after,
         "ticket_id": ticket,
-        "message": message,
-        "suggest": suggest,
-        "executed_at": (today or "") ,
-    }
-
-    return {
-        "ok": True,
-        "status_after": status_after,
-        "ticket_id": ticket,
-        "message": message,
-        "suggest": suggest,
-        "result_json": json.dumps(result, ensure_ascii=False),
-    }
+        "executed_at": today or "",
+    })
