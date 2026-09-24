@@ -252,6 +252,11 @@ Dify 提供两类做法：
 | 语言 | `Python3` |
 | 代码 | 完整粘贴 `dify/code/order_action.py` 的全部内容（[GitHub 打开](https://github.com/sytang-arch/smart_service/blob/main/dify/code/order_action.py) → 点 **Raw** → 全选复制） |
 
+**它在干嘛，一句话**：前面两个节点负责"听懂"和"取数"，这一个负责**"能不能做"**。
+LLM 只会生成文字，它没有任何能力拒绝一个不该做的操作 —— 而客服场景的第一要求恰恰是拒绝。
+所以判定权必须从模型手里拿出来，放进一段**确定性代码**里：输入订单和动作，输出
+`ok=true/false` 加一句理由。模型拿到的只是这段代码的结论，它只能负责把结论翻译成人话。
+
 **输入变量**（在代码节点上方「输入变量」区加，变量名必须和代码里的参数逐字一致）：
 
 | 变量名 | 类型 | 取值来源 |
@@ -260,7 +265,13 @@ Dify 提供两类做法：
 | `action` | String | `意图识别 / text`（整段意图 JSON，代码里自己会解析） |
 | `orders_json` | String | `查询客户订单 / body` |
 | `current_order_id` | String | `开始 / order_id`（页面上正在看的那笔，可为空） |
-| `today` | String | 不连上游，直接在值里填常量 `2026-09-22`（演示基准日，跟数据口径对齐） |
+
+> ⚠️ **一共就 4 个，别多加。** 每个变量的「值」都必须在右边那个下拉里**选**出来
+> （Dify 的变量取值只能选上游节点输出 / 系统变量 / 会话变量，**不能手打字面量**）。
+>
+> 具体说：**不要试图加一个 `today` 之类的日期变量然后填 `2026-09-22`** ——
+> 那个框里根本打不进常量，你会卡在这里。本节点也确实不需要日期：退货资格是
+> 订单数据自带的 `refund_eligible`，执行时间戳由代码内部取。少一个变量就少一处坑。
 
 **输出变量**（在「输出变量」区逐个声明，名字与代码 `return` 的 key 一致）：
 
@@ -528,7 +539,8 @@ node server/index.js
 | Agent 回答"您的账户下暂时没有订单" | HTTP 节点 URL 里的用户名/仓库名没换成自己的，或 `customer_id` 没接进 URL | 浏览器直接打开那个 URL，能返回 JSON 才算对 |
 | Agent 说"变量 customer_id 为空" | 开始节点没加输入变量，或变量名拼错（大小写敏感） | 核对第 3 步的三个变量名 |
 | 代码节点报 `output variable not found` | 输出变量没在节点里声明全 | 按第 6 步的表声明 6 个输出变量 |
-| 代码节点报 `TypeError: main() got an unexpected keyword argument` | 输入变量名和代码参数名不一致 | 代码签名是 `main(customer_id, action, orders_json, current_order_id, today)`，逐字对齐 |
+| 代码节点报 `TypeError: main() got an unexpected keyword argument` | 输入变量名和代码参数名不一致 | 代码签名是 `main(customer_id, action, orders_json, current_order_id)`，逐字对齐，且**不要多加变量** |
+| 输入变量的「值」框里打不进字，想填个常量 | Dify 的变量值只能从下拉里选，不支持字面量 | 要么在「开始」节点加个输入变量再在这里选它，要么干脆把常量写进代码（参考 `order_action.py` 里的 `_now_stamp()`） |
 | 代码节点返回 `BAD_PAYLOAD`（"数据无法解析"） | `orders_json` 接错了节点 | 它必须来自 `查询客户订单 / body`，不能接 `status_code` |
 | 问物流却答非所问 | `action` 接的不是 `意图识别 / text` | 核对第 6 步的输入变量表 |
 | 模型每次都输出 ```json 包裹 | 提示词约束不够强 | 在意图识别提示词末尾加："只输出 JSON 对象本身，禁止使用 markdown 代码块" |

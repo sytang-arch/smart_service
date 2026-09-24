@@ -1,12 +1,16 @@
 # =============================================================================
 # Dify 代码节点「售后判定」   文件位置：dify/code/order_action.py
 # -----------------------------------------------------------------------------
-# 输入变量（共 5 个，变量名必须与下面 main() 的参数逐字一致）：
+# 输入变量（共 4 个，变量名必须与下面 main() 的参数逐字一致）：
 #   customer_id       String  来自「开始」节点 —— 服务端注入的登录身份
 #   action            String  来自「意图识别」节点 —— 整段意图 JSON 文本
 #   orders_json       String  来自「查询客户订单」HTTP 节点 —— 该客户的订单列表
 #   current_order_id  String  来自「开始」节点 —— 页面上正在查看的订单（可为空）
-#   today             String  常量 —— 演示基准日 2026-09-22
+#
+# 为什么没有"日期"变量：Dify 的输入变量取值只能从变量选择器里选（上游输出 /
+# 系统变量 / 会话变量），不能手填字面量，所以"填个常量当日基准"这条路本身走不通。
+# 而本节点也真的不需要它 —— 退货资格是数据里自带的（refund_eligible），
+# 执行时间戳在代码内部取。别为了凑一个变量去多接一个节点。
 #
 # 输出变量（共 6 个，必须在节点里逐个声明）：
 #   ok / status_after / ticket_id / message / suggest / result_json
@@ -22,9 +26,14 @@
 
 import json
 
-NO_REASON_RETURN_DAYS = 7       # 7 天无理由退货
-QUALITY_EXCHANGE_DAYS = 15      # 15 天质量问题换货
-WARRANTY_MONTHS = 12            # 1 年质保
+try:                                    # Dify 沙箱只放行有限的库，取不到就降级
+    from datetime import datetime as _datetime
+except Exception:
+    _datetime = None
+
+# 退货 / 换货 / 质保的资格结论（refund_eligible / refund_note）由数据接口直接给出，
+# 口径写在 tools/generate_data.py 的生成逻辑里（签收日 + 7 天等）。
+# 换成真实后端时，这个判断应该由后端算好再返回 —— 业务规则不该散落在流程节点里。
 
 # 各订单状态允许的写操作 —— 这是本项目最核心的一张表
 ALLOWED = {
@@ -126,6 +135,19 @@ def _fail(message, suggest="", reason=""):
     return _reply(False, message, suggest, extra={"reason": reason} if reason else None)
 
 
+def _now_stamp():
+    """执行时间戳。只用于回显，不参与任何业务判定。
+
+    优先取真实时间；沙箱里取不到时退回数据快照基准日，保证不抛异常。
+    """
+    if _datetime is not None:
+        try:
+            return _datetime.now().strftime("%Y-%m-%d %H:%M")
+        except Exception:
+            pass
+    return "2026-09-22"
+
+
 def _locate(mine, want_oid, ok_status=None):
     """在客户自己的订单里定位目标订单；找不到返回 None。"""
     if want_oid:
@@ -142,7 +164,7 @@ def _locate(mine, want_oid, ok_status=None):
 
 # ----------------------------------------------------------------- 主函数 ----
 def main(customer_id: str, action: str, orders_json: str = "",
-         current_order_id: str = "", today: str = "2026-09-22") -> dict:
+         current_order_id: str = "") -> dict:
 
     customer_id = (customer_id or "").strip()
     if not customer_id:
@@ -260,13 +282,23 @@ def main(customer_id: str, action: str, orders_json: str = "",
         )
 
     # ---- 5. 退货资格校验（只在申请退款时）-----------------------------------
-    if act == "apply_refund" and not order.get("refund_eligible"):
-        return _fail(
-            "订单 %s 的退货资格不满足：%s"
-            % (oid, order.get("refund_note") or "已超出 7 天无理由退货期"),
-            SUGGEST["apply_refund"],
-            reason="NOT_ELIGIBLE",
-        )
+    if act == "apply_refund":
+        elig = order.get("refund_eligible")
+        if elig is None:
+            # 数据源没给结论时不要默认拒绝 —— 那是把"不知道"当成了"不行"。
+            return _fail(
+                "订单 %s 的退货资格暂时无法自动判定，已为您转人工核实，"
+                "一般 1 个工作日内会有客服联系您。" % oid,
+                "您也可以在订单详情页自行提交退货申请。",
+                reason="ELIGIBILITY_UNKNOWN",
+            )
+        if not elig:
+            return _fail(
+                "订单 %s 的退货资格不满足：%s"
+                % (oid, order.get("refund_note") or "已超出 7 天无理由退货期"),
+                SUGGEST["apply_refund"],
+                reason="NOT_ELIGIBLE",
+            )
 
     # ---- 6. 生成执行结果 ----------------------------------------------------
     amount = order.get("amount", 0)
@@ -320,5 +352,5 @@ def main(customer_id: str, action: str, orders_json: str = "",
         "status_before": status,
         "status_after": status_after,
         "ticket_id": ticket,
-        "executed_at": today or "",
+        "executed_at": _now_stamp(),
     })
