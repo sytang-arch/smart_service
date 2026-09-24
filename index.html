@@ -19,23 +19,9 @@
   </div>
   <div class="topbar-right">
     <span class="pill pill-ok" id="data-source-pill">数据加载中…</span>
-    <button class="btn btn-ghost" id="btn-guide">体验指引</button>
     <button class="btn btn-ghost" id="btn-reset">重置演示数据</button>
   </div>
 </header>
-
-<!-- 基础操作指引条 -->
-<section class="guidebar" id="guidebar">
-  <div class="guidebar-head">
-    <strong>3 步体验这个 Demo</strong>
-    <button class="guidebar-close" id="guidebar-close" title="收起">收起</button>
-  </div>
-  <ol class="guidebar-steps">
-    <li><b>① 选择身份</b>：选一位客户作为"当前登录用户"，整页权限随该身份收窄。</li>
-    <li><b>② 查看订单</b>：在订单列表点任意一笔，查看物流时间线、售后记录与可执行操作。</li>
-    <li><b>③ 让 AI 干活</b>：在 AI 客服对话框直接说"我的订单到哪了 / 帮我取消 O202609…"，Agent 会用该身份查订单并按政策处理售后。</li>
-  </ol>
-</section>
 
 <main class="layout">
 
@@ -135,45 +121,6 @@
 <footer class="footer">
   演示数据，非真实订单与客户信息 · 数据基准日 <span id="asof"></span> · 前端静态托管于 GitHub Pages，对话经轻量代理转发至 Dify
 </footer>
-
-<!-- 指引弹窗 -->
-<div class="modal" id="guide-modal" hidden>
-  <div class="modal-mask" data-close></div>
-  <div class="modal-panel">
-    <div class="modal-head">
-      <h3>体验指引 & 演示脚本</h3>
-      <button class="modal-close" data-close>×</button>
-    </div>
-    <div class="modal-body">
-      <h4>一、这个 Demo 演示了什么</h4>
-      <ul>
-        <li><b>身份即权限</b>：Agent 只认当前客户身份，跨客户订单号会被直接拒绝。</li>
-        <li><b>真实数据链路</b>：Agent 通过静态 REST 接口读订单，不靠模型编造。</li>
-        <li><b>可执行售后</b>：取消订单、申请退款、催发货等写操作由 Dify 代码节点状态机完成。</li>
-        <li><b>政策兜底</b>：7 天无理由、15 天换货、退款时效等回答来自知识库而非拍脑袋。</li>
-      </ul>
-
-      <h4>二、推荐演示动线（约 3 分钟）</h4>
-      <ol>
-        <li>选 <b>张伟（C1001）</b> 作为当前身份，问 AI："<i>我买的东西到哪了？</i>" → Agent 按身份查出运输中订单并给出物流节点。</li>
-        <li>继续问："<i>帮我取消 O202609190902</i>" → 待发货订单取消成功，给出退款时效。</li>
-        <li>切换身份到 <b>王强（C1003）</b>，仍问同一个订单号 → Agent 拒绝，且不透露任何订单字段。<b>这是最能打动面试官的一步。</b></li>
-        <li>切回 <b>张伟</b>，问："<i>那个耳机拆过了还能退吗？</i>" → 命中 7 天无理由政策，并核对签收日期给出结论。</li>
-      </ol>
-
-      <h4>三、常见追问速答</h4>
-      <dl class="qa">
-        <dt>数据从哪来？</dt><dd>预生成的静态 JSON 接口，<code>api/</code> 目录随仓库发布，Dify 用自定义工具按 OpenAPI 调用。</dd>
-        <dt>为什么不用真实后端？</dt><dd>Demo 要能"点开链接就看到"，静态托管零运维；写操作在 Dify 代码节点内做状态机，接口边界清晰，替换成真实后端只需换 Base URL。</dd>
-        <dt>API Key 会不会泄露？</dt><dd>不会。浏览器只访问自建代理，Key 只存在代理的进程环境变量里，从不进入前端代码。</dd>
-        <dt>Dify 里配置了哪些东西？</dt><dd>意图识别与回复两段提示词、开始节点的身份变量（customer_id / order_id）、HTTP 节点查订单、代码节点状态机、政策知识库。</dd>
-      </dl>
-
-      <h4>四、想自己配一套</h4>
-      <p>页面零依赖、零构建，<code>assets/js/config.js</code> 是唯一需要填配置的文件；<code>dify/</code> 目录下是 Agent 侧的接口定义与售后判定代码。</p>
-    </div>
-  </div>
-</div>
 
 <script src="assets/js/data.bundle.js"></script>
 <script src="assets/js/config.js"></script>

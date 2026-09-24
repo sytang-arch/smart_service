@@ -91,19 +91,6 @@ code { font-family: var(--mono); font-size: .92em; background: var(--info-soft);
 .btn-ok { border-color: #b7e3ce; color: var(--ok); }
 .btn-ok:hover { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
 
-/* ---------------- 指引条 ---------------- */
-.guidebar { background: var(--brand-soft); border-bottom: 1px solid #d5e3fb; padding: 12px 20px; }
-.guidebar-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-.guidebar-head strong { color: var(--brand-dark); font-size: 13.5px; }
-.guidebar-close {
-  margin-left: auto; background: none; border: none; color: var(--brand-dark);
-  font-size: 12px; cursor: pointer; opacity: .75;
-}
-.guidebar-close:hover { opacity: 1; text-decoration: underline; }
-.guidebar-steps { margin: 0; padding-left: 20px; color: #2b4a7d; font-size: 13px; }
-.guidebar-steps li { margin: 2px 0; }
-.guidebar-steps b { color: var(--brand-dark); }
-
 /* ---------------- 三栏布局 ---------------- */
 .layout {
   display: grid; gap: 16px; padding: 16px 20px;
@@ -337,35 +324,6 @@ code { font-family: var(--mono); font-size: .92em; background: var(--info-soft);
   text-align: center; border-top: 1px solid var(--line);
 }
 
-/* ---------------- 弹窗 ---------------- */
-.modal { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; }
-.modal[hidden] { display: none; }
-.modal-mask { position: absolute; inset: 0; background: rgba(18, 27, 42, .48); }
-.modal-panel {
-  position: relative; background: var(--panel); border-radius: 12px; width: min(760px, 100%);
-  max-height: 86vh; display: flex; flex-direction: column; box-shadow: 0 18px 48px rgba(18, 27, 42, .28);
-}
-.modal-head {
-  display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--line);
-}
-.modal-head h3 { font-size: 15.5px; }
-.modal-close {
-  margin-left: auto; background: none; border: none; font-size: 22px; line-height: 1;
-  color: var(--text-3); cursor: pointer;
-}
-.modal-close:hover { color: var(--text); }
-.modal-body { padding: 18px 22px 26px; overflow: auto; font-size: 13.5px; line-height: 1.72; }
-.modal-body h4 {
-  font-size: 13.5px; color: var(--brand-dark); margin: 18px 0 7px;
-  padding-left: 9px; border-left: 3px solid var(--brand);
-}
-.modal-body h4:first-child { margin-top: 0; }
-.modal-body ul, .modal-body ol { margin: 6px 0; padding-left: 21px; }
-.modal-body li { margin: 4px 0; }
-.qa { margin: 0; }
-.qa dt { font-weight: 650; margin-top: 9px; color: var(--text); }
-.qa dd { margin: 2px 0 0 0; color: var(--text-2); }
-
 /* ---------------- Toast ---------------- */
 #toast-wrap { position: fixed; top: 74px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 8px; align-items: center; }
 .toast {
@@ -436,14 +394,6 @@ code { font-family: var(--mono); font-size: .92em; background: var(--info-soft);
   .topbar-right .btn { padding: 9px 11px; font-size: 12.5px; }
   #data-source-pill { display: none; }
 
-  /* ---- 指引条：窄屏默认折叠，把首屏留给对话区 ---- */
-  .guidebar { padding: 10px 12px; }
-  .guidebar-head { margin-bottom: 0; }
-  .guidebar-head strong { font-size: 13px; }
-  .guidebar-steps { margin-top: 6px; padding-left: 17px; font-size: 12.5px; line-height: 1.58; }
-  body.guide-collapsed .guidebar-steps { display: none; }
-  .guidebar-close { padding: 6px 2px; font-size: 12.5px; }
-
   /* ---- 触摸目标放大到 ≥44px ---- */
   .btn { padding: 10px 14px; font-size: 13.5px; }
   .btn-sm { padding: 10px 13px; font-size: 13px; }
@@ -477,14 +427,6 @@ code { font-family: var(--mono); font-size: .92em; background: var(--info-soft);
   .chat-input .btn { padding: 11px 16px; }
   .chat-foot { padding: 6px 12px 9px; font-size: 10.5px; }
   .chat-foot .sep, .chat-foot span:last-child { display: none; }  /* 窄屏只保留连接状态 */
-
-  /* ---- 弹窗 ---- */
-  .modal { padding: 12px; }
-  .modal-panel { width: 100%; max-height: 86vh; max-height: 88dvh; }
-  .modal-head { padding: 13px 16px; }
-  .modal-head h3 { font-size: 14.5px; }
-  .modal-close { font-size: 26px; padding: 0 6px; }
-  .modal-body { padding: 15px 16px 22px; }
 
   /* ---- Toast 移到底部，避免遮挡顶栏 ---- */
   #toast-wrap { top: auto; bottom: calc(var(--tabbar-h-real) + 14px); }

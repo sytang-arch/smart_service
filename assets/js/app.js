@@ -83,7 +83,6 @@
     var top = 0;
     var bar = document.querySelector(".topbar");
     if (bar) top += bar.offsetHeight;         // sticky 顶栏仍占文档流位置
-    if (elVisible($("guidebar"))) top += $("guidebar").offsetHeight;
     top += 10;                                 // .layout 的 padding-top
     var h = Math.max(280, Math.round(viewportH() - top - tb - 8));
     col.style.setProperty("--chat-h", h + "px");
@@ -313,43 +312,11 @@
     });
   }
 
-  /* ---------------- 引导 ---------------- */
+  /* ---------------- 顶栏 ---------------- */
   function bindChrome() {
-    var modal = $("guide-modal");
-    $("btn-guide").addEventListener("click", function () { modal.hidden = false; });
-    Array.prototype.forEach.call(modal.querySelectorAll("[data-close]"), function (b) {
-      b.addEventListener("click", function () { modal.hidden = true; });
-    });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") modal.hidden = true;
-    });
     $("btn-reset").addEventListener("click", function () {
       if (confirm("重置所有本地售后操作，恢复初始演示数据？")) S.resetDemo();
     });
-    /* 窄屏：指引条默认折叠（首屏留给对话区），按钮在「展开 / 收起」间切换；
-       宽屏：维持原行为（点一下整条收起）。 */
-    var gbBtn = $("guidebar-close");
-    if (isMobile()) {
-      document.body.classList.add("guide-collapsed");
-      gbBtn.textContent = "展开";
-    }
-    gbBtn.addEventListener("click", function () {
-      if (isMobile()) {
-        var collapsed = document.body.classList.toggle("guide-collapsed");
-        gbBtn.textContent = collapsed ? "展开" : "收起";
-      } else {
-        $("guidebar").style.display = "none";
-      }
-      scheduleMetrics();   // 高度变了，重算对话面板
-    });
-
-    // 首次访问自动弹出指引
-    try {
-      if (!localStorage.getItem("cs_guide_seen")) {
-        modal.hidden = false;
-        localStorage.setItem("cs_guide_seen", "1");
-      }
-    } catch (e) {}
   }
 
   /* ---------------- 启动 ---------------- */
