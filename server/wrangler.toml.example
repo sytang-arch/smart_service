@@ -21,7 +21,7 @@ DIFY_API_BASE = "https://api.dify.ai/v1"
 # auto = 先「输入变量 + 前缀」，被 Dify 拒了自动降级为「仅前缀」（推荐）
 DIFY_IDENTITY_MODE = "auto"
 
-DIFY_APP_NAME = "云栖智能客服 Agent"
+DIFY_APP_NAME = "智能客服 Agent"
 
 # ★ 必填，且不要设成 "*"
 # 这个 Worker 手里握着能花钱的 API Key，CORS 放开等于给所有人一个免费代理，

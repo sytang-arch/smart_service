@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>云栖数码 · 智能客服工作台 Demo</title>
+<title>智能客服工作台 · Dify Agent Demo</title>
 <meta name="description" content="基于 Dify Agent 的电商智能客服 Demo：按客户身份查询订单、跟踪物流、处理售后，并把 AI 对话嵌入自建工作台。">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body data-panel="chat">
 
 <header class="topbar">
   <div class="brand">
-    <div class="brand-mark">云栖</div>
+    <div class="brand-mark">CS</div>
     <div class="brand-text">
-      <strong>云栖数码 · 智能客服工作台</strong>
+      <strong>智能客服工作台</strong>
       <span>Customer Service Workbench · powered by Dify Agent</span>
     </div>
   </div>
@@ -31,9 +31,9 @@
     <button class="guidebar-close" id="guidebar-close" title="收起">收起</button>
   </div>
   <ol class="guidebar-steps">
-    <li><b>① 选择身份</b>：在左侧点一位客户，左侧即"当前登录用户"，整页权限随身份收窄。</li>
-    <li><b>② 查看订单</b>：中间列表点任意订单，右侧看物流时间线、售后记录与可执行操作。</li>
-    <li><b>③ 让 AI 干活</b>：在右下对话框直接说"我的订单到哪了 / 帮我取消 O202609…"，AI 会用该身份查订单并按政策处理售后。</li>
+    <li><b>① 选择身份</b>：选一位客户作为"当前登录用户"，整页权限随该身份收窄。</li>
+    <li><b>② 查看订单</b>：在订单列表点任意一笔，查看物流时间线、售后记录与可执行操作。</li>
+    <li><b>③ 让 AI 干活</b>：在 AI 客服对话框直接说"我的订单到哪了 / 帮我取消 O202609…"，Agent 会用该身份查订单并按政策处理售后。</li>
   </ol>
 </section>
 
@@ -110,6 +110,28 @@
 
 </main>
 
+<!-- 移动端底部导航：仅在窄屏显示（桌面端三栏布局不变） -->
+<nav class="tabbar" id="tabbar" aria-label="视图切换">
+  <button type="button" class="tab-item" data-panel="identity" aria-label="客户身份">
+    <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="8" r="3.4"/><path d="M5.2 20c0-3.4 3.1-5.7 6.8-5.7s6.8 2.3 6.8 5.7"/>
+    </svg>
+    <span>身份</span>
+  </button>
+  <button type="button" class="tab-item" data-panel="orders" aria-label="我的订单">
+    <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="4.2" y="3.6" width="15.6" height="16.8" rx="2.4"/><path d="M8.4 9h7.2M8.4 13h7.2M8.4 17h4.2"/>
+    </svg>
+    <span>订单</span>
+  </button>
+  <button type="button" class="tab-item is-on" data-panel="chat" aria-label="AI 客服">
+    <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20.2 12.2c0 3.6-3.7 6.4-8.2 6.4-1 0-2-.14-2.9-.4L5 20l1.25-3.3C4.9 15.4 3.8 14 3.8 12.2 3.8 8.6 7.5 5.8 12 5.8s8.2 2.8 8.2 6.4z"/>
+    </svg>
+    <span>AI 客服</span>
+  </button>
+</nav>
+
 <footer class="footer">
   演示数据，非真实订单与客户信息 · 数据基准日 <span id="asof"></span> · 前端静态托管于 GitHub Pages，对话经轻量代理转发至 Dify
 </footer>
@@ -133,9 +155,9 @@
 
       <h4>二、推荐演示动线（约 3 分钟）</h4>
       <ol>
-        <li>左侧选 <b>张伟（C1001）</b>，问 AI："<i>我买的东西到哪了？</i>" → Agent 按身份查出运输中订单并给出物流节点。</li>
+        <li>选 <b>张伟（C1001）</b> 作为当前身份，问 AI："<i>我买的东西到哪了？</i>" → Agent 按身份查出运输中订单并给出物流节点。</li>
         <li>继续问："<i>帮我取消 O202609190902</i>" → 待发货订单取消成功，给出退款时效。</li>
-        <li>切到 <b>王强（C1003）</b>，仍问同一个订单号 → Agent 拒绝，说明这不是他的订单。<b>这是最能打动面试官的一步。</b></li>
+        <li>切换身份到 <b>王强（C1003）</b>，仍问同一个订单号 → Agent 拒绝，且不透露任何订单字段。<b>这是最能打动面试官的一步。</b></li>
         <li>切回 <b>张伟</b>，问："<i>那个耳机拆过了还能退吗？</i>" → 命中 7 天无理由政策，并核对签收日期给出结论。</li>
       </ol>
 

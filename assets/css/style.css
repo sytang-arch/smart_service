@@ -1,6 +1,7 @@
 /* ==========================================================================
-   云栖数码 · 智能客服工作台  —— 样式
+   智能客服工作台 —— 样式
    无外部依赖（不引 CDN），保证离线与静态托管下表现一致
+   移动端优先：窄屏切换为「单面板 + 底部导航」形态
    ========================================================================== */
 
 :root {
@@ -26,6 +27,9 @@
   --radius-sm: 7px;
   --shadow: 0 1px 2px rgba(20, 32, 51, .05), 0 6px 18px rgba(20, 32, 51, .05);
   --mono: "JetBrains Mono", "Cascadia Mono", Consolas, "Courier New", monospace;
+  /* 移动端底部导航高度（含 iOS 安全区，由 JS 读取后写回 --tabbar-h-real） */
+  --tabbar-h: 58px;
+  --tabbar-h-real: 58px;
 }
 
 * { box-sizing: border-box; }
@@ -177,8 +181,8 @@ code { font-family: var(--mono); font-size: .92em; background: var(--info-soft);
 .order-item:hover { border-color: var(--brand); background: #fbfdff; }
 .order-item.active { border-color: var(--brand); background: var(--brand-soft); }
 .order-item .oi-main { min-width: 0; flex: 1; }
-.order-item .oi-title { font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.order-item .oi-sub { font-size: 11.5px; color: var(--text-3); font-family: var(--mono); margin-top: 2px; }
+.order-item .oi-title { display: block; font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.order-item .oi-sub { display: block; font-size: 11.5px; color: var(--text-3); font-family: var(--mono); margin-top: 2px; }
 .order-item .oi-right { text-align: right; flex: none; }
 .order-item .oi-amount { font-size: 13px; font-weight: 650; }
 .order-item .oi-date { font-size: 11px; color: var(--text-3); margin-top: 2px; }
@@ -307,6 +311,9 @@ code { font-family: var(--mono); font-size: .92em; background: var(--info-soft);
 
 /* ---------------- 对话通道切换（工作台对话 / Dify 原生对话） ---------------- */
 .chat-tabs { display: flex; gap: 6px; padding: 10px 14px 0; }
+/* 注意：`.chat-tabs { display: flex }` 会盖掉浏览器对 [hidden] 的默认 display:none，
+   未配置 Dify WebApp 地址时这个标签必须真的不显示（否则点了没反应）。 */
+.chat-tabs[hidden] { display: none; }
 .chat-tab {
   font: inherit; font-size: 12px; padding: 5px 12px; cursor: pointer;
   border: 1px solid var(--line-strong); background: var(--panel); color: var(--text-2);
@@ -370,15 +377,122 @@ code { font-family: var(--mono); font-size: .92em; background: var(--info-soft);
 .toast-danger { background: #d93f4c; }
 @keyframes pop { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
 
+/* ---------------- 移动端专属元素（桌面端隐藏） ---------------- */
+.tabbar { display: none; }
+.btn-goto-orders { display: none; }
+
 /* ---------------- 响应式 ---------------- */
 @media (max-width: 1180px) {
   .layout { grid-template-columns: 240px minmax(0, 1fr); }
   .col-chat { grid-column: 1 / -1; position: static; max-height: none; }
   .chat-body { min-height: 320px; }
 }
-@media (max-width: 760px) {
-  .layout { grid-template-columns: 1fr; padding: 12px; }
-  .topbar { flex-wrap: wrap; }
+
+/* ==========================================================================
+   ≤900px：切换为「单面板 + 底部导航」。覆盖手机竖屏、手机横屏与平板竖屏。
+   桌面端三栏布局完全不受影响（本节所有规则都在媒体查询内）。
+   ========================================================================== */
+@media (max-width: 900px) {
+
+  /* ---- 底部导航 ---- */
+  .tabbar {
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    background: rgba(255, 255, 255, .97);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    backdrop-filter: saturate(180%) blur(12px);
+    border-top: 1px solid var(--line);
+    padding-bottom: env(safe-area-inset-bottom, 0px);   /* iPhone 底部横条 */
+    box-shadow: 0 -2px 14px rgba(20, 32, 51, .07);
+  }
+  .tab-item {
+    flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; min-height: 56px; padding: 7px 4px 6px;
+    background: none; border: none; font: inherit; color: var(--text-3);
+    cursor: pointer; transition: color .14s; -webkit-tap-highlight-color: transparent;
+  }
+  .tab-item svg { display: block; }
+  .tab-item span { font-size: 11px; font-weight: 600; }
+  .tab-item:active { background: var(--info-soft); }
+  .tab-item.is-on { color: var(--brand); }
+
+  /* ---- 单列：一次只显示一个面板 ---- */
+  .layout { grid-template-columns: 1fr; gap: 0; padding: 10px 10px 0; }
+  .col { display: none; }
+  body[data-panel="identity"] .col-identity,
+  body[data-panel="orders"]   .col-orders,
+  body[data-panel="chat"]     .col-chat { display: flex; }
+
+  /* 内容不被底部导航遮挡 */
+  body { padding-bottom: calc(var(--tabbar-h-real) + 6px); }
+  .footer { display: none; }
+
+  /* ---- 顶栏：压成一行 ---- */
+  .topbar { flex-wrap: nowrap; padding: 9px 12px; gap: 8px; }
+  .brand { gap: 9px; }
+  .brand-mark { width: 32px; height: 32px; border-radius: 9px; font-size: 12px; letter-spacing: 0; }
+  .brand-text strong { font-size: 14px; white-space: nowrap; }
   .brand-text span { display: none; }
-  .guidebar { font-size: 12.5px; }
+  .topbar-right { gap: 6px; }
+  .topbar-right .btn { padding: 9px 11px; font-size: 12.5px; }
+  #data-source-pill { display: none; }
+
+  /* ---- 指引条 ---- */
+  .guidebar { padding: 10px 12px; }
+  .guidebar-head strong { font-size: 13px; }
+  .guidebar-steps { padding-left: 17px; font-size: 12.5px; line-height: 1.58; }
+  .guidebar-close { padding: 6px 2px; font-size: 12.5px; }
+
+  /* ---- 触摸目标放大到 ≥44px ---- */
+  .btn { padding: 10px 14px; font-size: 13.5px; }
+  .btn-sm { padding: 10px 13px; font-size: 13px; }
+  .chip { padding: 8px 13px; font-size: 12.5px; }
+  .chat-tab { padding: 9px 15px; font-size: 12.5px; }
+  .id-item { padding: 11px 12px; }
+  .order-item { padding: 13px; }
+  .actions { gap: 8px; }
+  .actions .btn { flex: 1 1 40%; }
+
+  /* ---- 身份面板：给一个明确的去路（手机上订单在另一个面板） ---- */
+  .btn-goto-orders { display: block; width: 100%; margin-top: 10px; }
+
+  /* ---- 订单面板 ---- */
+  .order-list { max-height: none; padding: 10px 12px; }
+  .detail { padding: 14px 12px; scroll-margin-top: 62px; }
+  .detail-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px 12px; }
+  .detail-title h3 { font-size: 13.5px; }
+  /* 商品明细表：允许横向滑动，避免撑破布局 */
+  .items-table { display: block; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+  .items-table thead, .items-table tbody { display: table; width: 100%; min-width: 460px; }
+
+  /* ---- 对话面板：撑满可视区，接近原生 App ---- */
+  .col-chat { position: static; max-height: none; height: var(--chat-h, 60vh); }
+  .col-head { padding: 11px 13px; }
+  .chat-body { min-height: 0; padding: 12px; overscroll-behavior: contain; }
+  .msg-bubble { font-size: 14px; }
+  .chat-quick { padding: 0 12px 8px; gap: 6px; }
+  .chat-input { padding: 9px 12px; gap: 8px; }
+  .chat-input textarea { font-size: 16px; min-height: 42px; }   /* ≥16px：避免 iOS 聚焦时自动放大整页 */
+  .chat-input .btn { padding: 11px 16px; }
+  .chat-foot { padding: 6px 12px 9px; font-size: 10.5px; }
+  .chat-foot .sep, .chat-foot span:last-child { display: none; }  /* 窄屏只保留连接状态 */
+
+  /* ---- 弹窗 ---- */
+  .modal { padding: 12px; }
+  .modal-panel { width: 100%; max-height: 86vh; max-height: 88dvh; }
+  .modal-head { padding: 13px 16px; }
+  .modal-head h3 { font-size: 14.5px; }
+  .modal-close { font-size: 26px; padding: 0 6px; }
+  .modal-body { padding: 15px 16px 22px; }
+
+  /* ---- Toast 移到底部，避免遮挡顶栏 ---- */
+  #toast-wrap { top: auto; bottom: calc(var(--tabbar-h-real) + 14px); }
+}
+
+/* ==========================================================================
+   ≤420px：小屏手机再收一档
+   ========================================================================== */
+@media (max-width: 420px) {
+  .detail-grid { grid-template-columns: 1fr; }
+  .actions .btn { flex: 1 1 100%; }
+  .tab-item span { font-size: 10.5px; }
 }

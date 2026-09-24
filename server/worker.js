@@ -105,7 +105,7 @@ export default {
         dify_configured: Boolean(env.DIFY_API_KEY),
         identity_mode: env.DIFY_IDENTITY_MODE || "auto",
         cors_locked: Boolean(String(env.ALLOWED_ORIGIN || "").trim()),
-        app_name: env.DIFY_APP_NAME || "云栖智能客服 Agent",
+        app_name: env.DIFY_APP_NAME || "智能客服 Agent",
       }, 200, env, request);
     }
 

@@ -196,7 +196,9 @@
       .then(function () {
         state.sending = false;
         el.send.disabled = false;
-        el.text.focus();
+        /* 窄屏上自动聚焦会立刻弹出软键盘、挡住刚返回的回复，交给用户自己点 */
+        var narrow = window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
+        if (!narrow) el.text.focus();
       });
   }
 
@@ -557,7 +559,11 @@
       qbox.appendChild(b);
     });
 
-    addMsg("ai", "您好，我是" + (cfg.ASSISTANT_NAME || "在线客服") + " 👋\n\n左侧切换客户身份后，我可以帮他查订单、看物流、取消订单、处理退款。\n\n**试一句：「我的订单到哪了？」**");
+    addMsg("ai",
+      "您好，我是" + (cfg.ASSISTANT_NAME || "在线客服") + " 👋\n\n" +
+      "切换客户身份后，我可以帮他查订单、看物流、取消订单、处理退款。\n\n" +
+      "**试一句：「我的订单到哪了？」**\n\n" +
+      "（想看差别：换成另一位客户，再问同一个订单号 —— 会被直接拒绝。）");
 
     setupChannels();
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-「云栖数码」智能客服 Demo —— 模拟数据生成器
+智能客服工作台 Demo —— 模拟数据生成器
 ================================================
 一次运行产出三份互相一致的数据产物：
 
@@ -381,7 +381,7 @@ def build_orders():
 
 def build_kb():
     return {
-        "brand": "云栖数码官方商城",
+        "brand": "官方商城",
         "service_hours": "在线客服 9:00-21:00（黄金及以上会员 8:00-22:00，钻石会员 7×24）",
         "hotline": "400-820-9900",
         "policies": [
@@ -420,7 +420,7 @@ def main():
     kb = build_kb()
 
     meta = {
-        "demo_name": "云栖数码 · 智能客服 Demo",
+        "demo_name": "智能客服工作台 · Dify Agent Demo",
         "scenario": "数码 3C 电商在线客服",
         "data_as_of": TODAY.isoformat(),
         "customers": len(customers),
@@ -444,7 +444,7 @@ def main():
 
     # --- 3.2 静态 API 切片（供 Dify 调用）---
     wjson(os.path.join(API_DIR, "manifest.json"), {
-        "name": "云栖数码客服 Demo 静态数据接口",
+        "name": "智能客服 Demo 静态数据接口",
         "version": "1.0.0",
         "note": "只读静态接口。由 GitHub Pages / 任意静态托管直接提供，Dify 自定义工具可原样调用。",
         "endpoints": [

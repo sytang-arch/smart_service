@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: 云栖数码客服数据接口（静态只读）
+  title: 智能客服 Demo 数据接口（静态只读）
   description: |
     由 GitHub Pages 静态托管的只读数据接口，用于智能客服 Demo。
     数据按客户 / 订单预生成为 JSON 切片，路径即查询条件。

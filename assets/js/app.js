@@ -32,6 +32,93 @@
     }, 2600);
   }
 
+  /* ======================================================================
+     移动端（≤900px）：底部 Tab 切换 + 面板高度自适应
+     桌面端三栏同屏，这套逻辑不参与（isMobile() 为 false 时全部空转）
+     ====================================================================== */
+  var mq = window.matchMedia ? window.matchMedia("(max-width: 900px)") : null;
+
+  function isMobile() { return mq ? mq.matches : window.innerWidth <= 900; }
+
+  /** 真实可视高度：键盘弹起时 innerHeight 不变，visualViewport 才准 */
+  function viewportH() {
+    return (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+  }
+
+  function elVisible(n) {
+    if (!n) return false;
+    var cs = window.getComputedStyle(n);
+    return cs.display !== "none" && cs.visibility !== "hidden";
+  }
+
+  function tabbarH() {
+    var tb = $("tabbar");
+    return elVisible(tb) ? tb.offsetHeight : 0;
+  }
+
+  /** 切换移动端面板；桌面端调用无副作用（属性不被任何桌面样式读取） */
+  function showPanel(name) {
+    if (["identity", "orders", "chat"].indexOf(name) === -1) return;
+    document.body.setAttribute("data-panel", name);
+    Array.prototype.forEach.call(document.querySelectorAll(".tab-item"), function (b) {
+      var on = b.getAttribute("data-panel") === name;
+      b.classList.toggle("is-on", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    window.scrollTo(0, 0);
+    syncMobileMetrics();
+  }
+
+  /** 把底部导航真实高度与对话面板高度写回 CSS 变量 */
+  function syncMobileMetrics() {
+    var tb = tabbarH();
+    document.documentElement.style.setProperty("--tabbar-h-real", tb + "px");
+
+    var col = document.querySelector(".col-chat");
+    if (!col) return;
+    if (!isMobile() || document.body.getAttribute("data-panel") !== "chat") {
+      col.style.removeProperty("--chat-h");
+      return;
+    }
+    var top = 0;
+    var bar = document.querySelector(".topbar");
+    if (bar) top += bar.offsetHeight;         // sticky 顶栏仍占文档流位置
+    if (elVisible($("guidebar"))) top += $("guidebar").offsetHeight;
+    top += 10;                                 // .layout 的 padding-top
+    var h = Math.max(280, Math.round(viewportH() - top - tb - 8));
+    col.style.setProperty("--chat-h", h + "px");
+  }
+
+  var metricRaf = null;
+  function scheduleMetrics() {
+    if (metricRaf) return;
+    metricRaf = window.requestAnimationFrame(function () {
+      metricRaf = null;
+      syncMobileMetrics();
+    });
+  }
+
+  function setupMobile() {
+    var tabbar = $("tabbar");
+    if (tabbar) {
+      tabbar.addEventListener("click", function (e) {
+        var t = e.target;
+        while (t && t !== tabbar && !t.getAttribute("data-panel")) t = t.parentNode;
+        if (t && t !== tabbar) showPanel(t.getAttribute("data-panel"));
+      });
+    }
+    showPanel(document.body.getAttribute("data-panel") || "chat");
+
+    window.addEventListener("resize", scheduleMetrics);
+    window.addEventListener("orientationchange", scheduleMetrics);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", scheduleMetrics);
+      window.visualViewport.addEventListener("scroll", scheduleMetrics);
+    }
+    if (mq && mq.addEventListener) mq.addEventListener("change", scheduleMetrics);
+    window.setTimeout(scheduleMetrics, 150);   // 等首次布局稳定
+  }
+
   /* ---------------- 左栏 ---------------- */
   function renderIdentity() {
     var me = S.currentCustomer();
@@ -41,7 +128,10 @@
         '<div class="id-meta"><code>' + esc(me.customer_id) + "</code> · " + esc(me.phone) + " · " + esc(me.city) + "</div>" +
         '<div class="id-addr">收货地址：' + esc(me.address) + "</div>" +
         '<div class="id-tags">' + me.tags.map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") + "</div>" +
-      "</div>";
+      "</div>" +
+      /* 仅窄屏显示：手机上「身份」与「订单」是两个面板，给一个明确的去路 */
+      '<button type="button" class="btn btn-primary btn-goto-orders" id="btn-goto-orders">' +
+        "查看该客户订单（" + S.ordersOf(me.customer_id).length + " 笔）→</button>";
 
     $("identity-list").innerHTML = S.customers.map(function (c) {
       return '<button class="id-item' + (c.customer_id === S.currentCustomerId ? " active" : "") + '" data-cid="' + c.customer_id + '">' +
@@ -54,6 +144,9 @@
     Array.prototype.forEach.call(document.querySelectorAll(".id-item"), function (b) {
       b.addEventListener("click", function () { switchCustomer(b.getAttribute("data-cid")); });
     });
+
+    var go = $("btn-goto-orders");
+    if (go) go.addEventListener("click", function () { showPanel("orders"); });
   }
 
   function switchCustomer(cid) {
@@ -94,6 +187,11 @@
     renderOrders();
     renderDetail();
     window.CSChat.setIdentity(S.currentCustomer(), S.getOrder(oid));
+    // 窄屏下列表与详情同处一个面板，选中后需要把详情带到眼前
+    if (isMobile()) {
+      var d = $("detail");
+      if (d && d.scrollIntoView) d.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   /* ---------------- 中栏：订单详情 ---------------- */
@@ -182,6 +280,8 @@
     var ask = $("btn-ask-ai");
     if (ask) {
       ask.addEventListener("click", function () {
+        // 手机上对话在另一个面板，先切过去，否则点了看不到反应
+        if (isMobile()) showPanel("chat");
         window.CSChat.send("请帮我看一下订单 " + o.order_id + " 现在是什么情况，可以怎么处理？");
       });
     }
@@ -228,6 +328,7 @@
     });
     $("guidebar-close").addEventListener("click", function () {
       $("guidebar").style.display = "none";
+      scheduleMetrics();   // 收起后可用高度变大，重算对话面板
     });
 
     // 首次访问自动弹出指引
@@ -242,6 +343,7 @@
   /* ---------------- 启动 ---------------- */
   function boot() {
     bindChrome();
+    setupMobile();
     S.load().then(function () {
       var pill = $("data-source-pill");
       pill.textContent = S.source === "api"
@@ -254,6 +356,7 @@
       renderOrders();
       renderDetail();
       renderEndpoints();
+      scheduleMetrics();   // 数据渲染完成后重算一次高度
 
       return window.CSChat.init().then(function () {
         window.CSChat.setIdentity(S.currentCustomer(), null);

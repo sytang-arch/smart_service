@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ==========================================================================
-   云栖数码 · 智能客服 Demo —— 本地代理 + 静态站点服务器
+   智能客服工作台 Demo —— 本地代理 + 静态站点服务器
    --------------------------------------------------------------------------
    两个职责，一个进程搞定：
 
@@ -47,7 +47,7 @@ const PORT = Number(process.env.PORT || 8787);
 const HOST = process.env.HOST || "127.0.0.1";
 const DIFY_API_BASE = (process.env.DIFY_API_BASE || "https://api.dify.ai/v1").replace(/\/+$/, "");
 const DIFY_API_KEY = process.env.DIFY_API_KEY || "";
-const APP_NAME = process.env.DIFY_APP_NAME || "云栖智能客服 Agent";
+const APP_NAME = process.env.DIFY_APP_NAME || "智能客服 Agent";
 /* 身份注入方式：
      auto   = 先「输入变量 + 前缀」双保险，被 Dify 拒了自动降级为「仅前缀」（默认）
      inputs = 只走 Dify 应用输入变量（需在 Chatflow「开始」节点建好同名变量）
@@ -278,7 +278,7 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, HOST, () => {
   const line = "=".repeat(62);
   console.log(line);
-  console.log("  云栖数码 · 智能客服 Demo 已启动");
+  console.log("  智能客服工作台 Demo 已启动");
   console.log(line);
   console.log("  页面地址   : http://" + HOST + ":" + PORT);
   console.log("  静态接口   : http://" + HOST + ":" + PORT + "/api/orders/by-customer/C1001.json");
@@ -287,5 +287,8 @@ server.listen(PORT, HOST, () => {
   console.log(line);
   if (!DIFY_API_KEY) {
     console.log("  下一步：cp .env.example .env  →  填入 DIFY_API_KEY=app-xxxx  →  重启");
+  }
+  if (HOST === "127.0.0.1") {
+    console.log("  手机预览：想用手机看本地效果，把 .env 的 HOST 改成 0.0.0.0，再用手机访问 http://<本机IP>:" + PORT);
   }
 });

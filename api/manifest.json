@@ -1,5 +1,5 @@
 {
-  "name": "云栖数码客服 Demo 静态数据接口",
+  "name": "智能客服 Demo 静态数据接口",
   "version": "1.0.0",
   "note": "只读静态接口。由 GitHub Pages / 任意静态托管直接提供，Dify 自定义工具可原样调用。",
   "endpoints": [

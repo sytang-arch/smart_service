@@ -2,7 +2,7 @@
    用途：本地以 file:// 打开页面时的离线兜底数据。 */
 window.CS_DATA = {
   "meta": {
-    "demo_name": "云栖数码 · 智能客服 Demo",
+    "demo_name": "智能客服工作台 · Dify Agent Demo",
     "scenario": "数码 3C 电商在线客服",
     "data_as_of": "2026-09-22",
     "customers": 6,
@@ -2395,7 +2395,7 @@ window.CS_DATA = {
     }
   ],
   "kb": {
-    "brand": "云栖数码官方商城",
+    "brand": "官方商城",
     "service_hours": "在线客服 9:00-21:00（黄金及以上会员 8:00-22:00，钻石会员 7×24）",
     "hotline": "400-820-9900",
     "policies": [
