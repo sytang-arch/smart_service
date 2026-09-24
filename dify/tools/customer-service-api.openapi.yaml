@@ -71,10 +71,10 @@ paths:
         - name: order_id
           in: path
           required: true
-          description: 订单号，形如 O202609190902
+          description: 订单号，形如 O2026xxxx0902（日期段随数据生成日滚动，必须原样使用用户给出的单号）
           schema:
             type: string
-            example: O202609190902
+            example: O2026xxxx0902
       responses:
         "200":
           description: 订单详情
