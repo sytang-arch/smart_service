@@ -4,7 +4,7 @@
    · 优先从静态 API（api/**.json）读取，与 Dify Agent 吃同一份数据
    · 读取失败（例如用 file:// 直接打开）自动回落到内置数据包 data.bundle.js
    · 售后写操作在前端做本地状态机，写入 localStorage，刷新不丢；
-     真实生产环境应把这些动作换成后端接口 —— 接口边界见 docs/architecture.md
+     真实生产环境应把这些动作换成后端接口 —— 接口契约见 dify/tools/customer-service-api.openapi.yaml
    ========================================================================== */
 (function () {
   "use strict";

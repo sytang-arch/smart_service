@@ -144,11 +144,11 @@
         <dt>数据从哪来？</dt><dd>预生成的静态 JSON 接口，<code>api/</code> 目录随仓库发布，Dify 用自定义工具按 OpenAPI 调用。</dd>
         <dt>为什么不用真实后端？</dt><dd>Demo 要能"点开链接就看到"，静态托管零运维；写操作在 Dify 代码节点内做状态机，接口边界清晰，替换成真实后端只需换 Base URL。</dd>
         <dt>API Key 会不会泄露？</dt><dd>不会。浏览器只访问自建代理，Key 只存在代理的进程环境变量里，从不进入前端代码。</dd>
-        <dt>Dify 里配置了哪些东西？</dt><dd>系统提示词、会话变量（customer_id / current_order_id）、OpenAPI 自定义工具、代码节点状态机、政策知识库。</dd>
+        <dt>Dify 里配置了哪些东西？</dt><dd>意图识别与回复两段提示词、开始节点的身份变量（customer_id / order_id）、HTTP 节点查订单、代码节点状态机、政策知识库。</dd>
       </dl>
 
       <h4>四、想自己配一套</h4>
-      <p>仓库 <code>docs/dify-setup.md</code> 是从零到能跑的分步指引；<code>assets/js/config.js</code> 是页面唯一需要填配置的文件。</p>
+      <p>页面零依赖、零构建，<code>assets/js/config.js</code> 是唯一需要填配置的文件；<code>dify/</code> 目录下是 Agent 侧的接口定义与售后判定代码。</p>
     </div>
   </div>
 </div>
