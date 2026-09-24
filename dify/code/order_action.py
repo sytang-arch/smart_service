@@ -27,9 +27,9 @@
 import json
 
 try:                                    # Dify 沙箱只放行有限的库，取不到就降级
-    from datetime import datetime as _datetime
+    from datetime import datetime as _datetime, timedelta as _timedelta, timezone as _timezone
 except Exception:
-    _datetime = None
+    _datetime = _timedelta = _timezone = None
 
 # 退货 / 换货 / 质保的资格结论（refund_eligible / refund_note）由数据接口直接给出，
 # 口径写在 tools/generate_data.py 的生成逻辑里（签收日 + 7 天等）。
@@ -140,13 +140,16 @@ def _fail(message, suggest="", reason=""):
 
 
 def _now_stamp():
-    """执行时间戳。只用于回显，不参与任何业务判定。
+    """执行时间戳（北京时间）。只用于回显，不参与任何业务判定。
 
-    优先取真实时间；沙箱里取不到时退回数据快照基准日，保证不抛异常。
+    Dify 的代码节点跑在 UTC 容器里，直接用 now() 会比北京时间早 8 小时 ——
+    回显给用户就是"我下午三点操作，单子上写着早上七点半"，一眼穿帮。
+    所以按 UTC+8 取值；沙箱里连 datetime 都取不到时，退回数据快照基准日。
     """
     if _datetime is not None:
         try:
-            return _datetime.now().strftime("%Y-%m-%d %H:%M")
+            tz = _timezone(_timedelta(hours=8)) if (_timezone and _timedelta) else None
+            return (_datetime.now(tz) if tz else _datetime.now()).strftime("%Y-%m-%d %H:%M")
         except Exception:
             pass
     return "2026-09-22"
@@ -164,6 +167,20 @@ def _locate(mine, want_oid, ok_status=None):
         if ok_status is None or o.get("status") in ok_status:
             return o
     return None
+
+
+def _scope_fail(want_oid):
+    """「订单不属于你」与「订单不存在」必须回同一句话。
+
+    只要两种情况的措辞不同，攻击者就能用返回文案反推「这个单号在系统里存在」——
+    这本身就是一条泄露。所以全流程共用这一个出口，别再各写各的。
+    """
+    return _fail(
+        "您的账户下没有找到订单 %s。请核对订单号，或者告诉我您要处理哪一笔，"
+        "我把您的订单列给您。" % want_oid,
+        "为了保护账户隐私，我不会查询或操作他人订单。",
+        reason="ORDER_NOT_IN_SCOPE",
+    )
 
 
 def _strip_wrappers(raw):
@@ -280,6 +297,21 @@ def main(customer_id: str, action: str, orders_json: str = "",
 
     # ---- 2. 只读意图：列出订单 / 查物流 -------------------------------------
     if act == LIST:
+        # 用户点名了某一笔就只回那一笔。★ 这一步必须先过身份闸门：
+        # 「帮我查一下 O202609190902」和「帮我查 O202609190902 到哪了」是同一件事，
+        # 不能因为意图被分成 query_order / query_logistics 就让后者才拦、前者放行，
+        # 否则越权拦截可以靠换个说法绕过。
+        if want_oid:
+            hit = _locate(mine, want_oid)
+            if hit is None:
+                return _scope_fail(want_oid)
+            return _reply(True, "为您查到订单 %s（%s）。" % (
+                hit.get("order_id"), _name(hit)), extra={
+                "mode": "order_list",
+                "count": 1,
+                "orders": [_brief(hit)],
+                "truncated": False,
+            })
         n = len(mine)
         return _reply(True, "为您查到 %d 笔订单，按时间倒序。" % n, extra={
             "mode": "order_list",
@@ -294,7 +326,7 @@ def main(customer_id: str, action: str, orders_json: str = "",
              or _locate(mine, want_oid, ["delivered"])
              or _locate(mine, want_oid))
         if o is None:
-            return _fail("您的账户下没有找到订单 %s。" % want_oid, reason="ORDER_NOT_IN_SCOPE")
+            return _scope_fail(want_oid)
         tl = o.get("timeline") or []
         return _reply(True, "订单 %s（%s）当前状态：%s。" % (
             o.get("order_id"), _name(o), o.get("status_label")), extra={
@@ -319,14 +351,8 @@ def main(customer_id: str, action: str, orders_json: str = "",
     if want_oid:
         order = _locate(mine, want_oid)
         if order is None:
-            # 第二道闸。措辞与「订单不存在」完全一致 —— 不区分「不存在」和「不属于你」，
-            # 这样连"这个单号是存在的"这一位信息也不会泄露。
-            return _fail(
-                "您的账户下没有找到订单 %s。请核对订单号，或者告诉我您要处理哪一笔，"
-                "我把您的订单列给您。" % want_oid,
-                "为了保护账户隐私，我不会查询或操作他人订单。",
-                reason="ORDER_NOT_IN_SCOPE",
-            )
+            # 第二道闸。措辞与「订单不存在」完全一致 —— 见 _scope_fail 的说明。
+            return _scope_fail(want_oid)
     else:
         order = _locate(mine, "", [s for s, acts in ALLOWED.items()
                                    if act in acts or act in ALWAYS_ALLOWED])
