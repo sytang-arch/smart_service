@@ -326,9 +326,21 @@
     $("btn-reset").addEventListener("click", function () {
       if (confirm("重置所有本地售后操作，恢复初始演示数据？")) S.resetDemo();
     });
-    $("guidebar-close").addEventListener("click", function () {
-      $("guidebar").style.display = "none";
-      scheduleMetrics();   // 收起后可用高度变大，重算对话面板
+    /* 窄屏：指引条默认折叠（首屏留给对话区），按钮在「展开 / 收起」间切换；
+       宽屏：维持原行为（点一下整条收起）。 */
+    var gbBtn = $("guidebar-close");
+    if (isMobile()) {
+      document.body.classList.add("guide-collapsed");
+      gbBtn.textContent = "展开";
+    }
+    gbBtn.addEventListener("click", function () {
+      if (isMobile()) {
+        var collapsed = document.body.classList.toggle("guide-collapsed");
+        gbBtn.textContent = collapsed ? "展开" : "收起";
+      } else {
+        $("guidebar").style.display = "none";
+      }
+      scheduleMetrics();   // 高度变了，重算对话面板
     });
 
     // 首次访问自动弹出指引

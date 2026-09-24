@@ -436,10 +436,12 @@ code { font-family: var(--mono); font-size: .92em; background: var(--info-soft);
   .topbar-right .btn { padding: 9px 11px; font-size: 12.5px; }
   #data-source-pill { display: none; }
 
-  /* ---- 指引条 ---- */
+  /* ---- 指引条：窄屏默认折叠，把首屏留给对话区 ---- */
   .guidebar { padding: 10px 12px; }
+  .guidebar-head { margin-bottom: 0; }
   .guidebar-head strong { font-size: 13px; }
-  .guidebar-steps { padding-left: 17px; font-size: 12.5px; line-height: 1.58; }
+  .guidebar-steps { margin-top: 6px; padding-left: 17px; font-size: 12.5px; line-height: 1.58; }
+  body.guide-collapsed .guidebar-steps { display: none; }
   .guidebar-close { padding: 6px 2px; font-size: 12.5px; }
 
   /* ---- 触摸目标放大到 ≥44px ---- */
