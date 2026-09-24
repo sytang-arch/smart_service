@@ -1,58 +1,58 @@
 {
-  "order_id": "O202609170912",
-  "customer_id": "C1003",
+  "order_id": "O202609200907",
+  "customer_id": "C1002",
   "status": "in_transit",
   "status_label": "运输中",
-  "created_at": "2026-09-17 12:24",
-  "paid_at": "2026-09-17 12:36",
-  "shipped_at": "2026-09-18 15:24",
+  "created_at": "2026-09-20 16:49",
+  "paid_at": "2026-09-20 17:01",
+  "shipped_at": "2026-09-21 18:49",
   "signed_at": null,
   "completed_at": null,
-  "amount": 4999.0,
+  "amount": 1299.0,
   "currency": "CNY",
-  "pay_method": "在线支付（支付宝）",
+  "pay_method": "在线支付（微信）",
   "items": [
     {
-      "sku": "SKU-A001",
-      "name": "星耀 X1 Pro 智能手机 256GB",
-      "price": 4999.0,
+      "sku": "SKU-B002",
+      "name": "声动 Studio 头戴式降噪耳机",
+      "price": 1299.0,
       "qty": 1,
-      "subtotal": 4999.0
+      "subtotal": 1299.0
     }
   ],
-  "carrier": "京东物流",
-  "carrier_phone": "950616",
-  "tracking_no": "JD202609170912",
-  "estimated_delivery": "2026-09-21",
-  "address": "广州市天河区体育西路 103 号 2201",
+  "carrier": "顺丰速运",
+  "carrier_phone": "95338",
+  "tracking_no": "SF202609200907",
+  "estimated_delivery": "2026-09-25",
+  "address": "北京市海淀区中关村大街 27 号 A 座 1801",
   "timeline": [
     {
-      "at": "2026-09-17 12:24",
+      "at": "2026-09-20 16:49",
       "text": "订单创建，等待付款",
       "type": "order"
     },
     {
-      "at": "2026-09-17 12:36",
+      "at": "2026-09-20 17:01",
       "text": "支付成功",
       "type": "order"
     },
     {
-      "at": "2026-09-18 15:24",
-      "text": "京东物流 已揽收，运单号 JD202609170912",
+      "at": "2026-09-21 18:49",
+      "text": "顺丰速运 已揽收，运单号 SF202609200907",
       "type": "ship"
     },
     {
-      "at": "2026-09-18 21:24",
+      "at": "2026-09-21 23:49",
       "text": "已从【发货仓】发出",
       "type": "ship"
     },
     {
-      "at": "2026-09-19 21:24",
+      "at": "2026-09-22 23:49",
       "text": "到达【区域分拨中心】",
       "type": "ship"
     },
     {
-      "at": "2026-09-20 21:24",
+      "at": "2026-09-23 23:49",
       "text": "到达【城市转运中心】",
       "type": "ship"
     }
@@ -69,5 +69,5 @@
     "查询物流",
     "申报物流异常"
   ],
-  "internal_note": "高价值快件，需本人签收"
+  "internal_note": ""
 }

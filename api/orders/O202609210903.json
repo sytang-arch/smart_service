@@ -1,59 +1,54 @@
 {
-  "order_id": "O202609150907",
-  "customer_id": "C1002",
+  "order_id": "O202609210903",
+  "customer_id": "C1001",
   "status": "in_transit",
   "status_label": "运输中",
-  "created_at": "2026-09-15 16:49",
-  "paid_at": "2026-09-15 17:01",
-  "shipped_at": "2026-09-16 19:49",
+  "created_at": "2026-09-21 12:21",
+  "paid_at": "2026-09-21 12:33",
+  "shipped_at": "2026-09-22 14:21",
   "signed_at": null,
   "completed_at": null,
-  "amount": 1299.0,
+  "amount": 298.0,
   "currency": "CNY",
   "pay_method": "在线支付（微信）",
   "items": [
     {
-      "sku": "SKU-B002",
-      "name": "声动 Studio 头戴式降噪耳机",
-      "price": 1299.0,
-      "qty": 1,
-      "subtotal": 1299.0
+      "sku": "SKU-E001",
+      "name": "极速 65W 氮化镓充电器",
+      "price": 149.0,
+      "qty": 2,
+      "subtotal": 298.0
     }
   ],
   "carrier": "顺丰速运",
   "carrier_phone": "95338",
-  "tracking_no": "SF202609150907",
-  "estimated_delivery": "2026-09-19",
-  "address": "北京市海淀区中关村大街 27 号 A 座 1801",
+  "tracking_no": "SF202609210903",
+  "estimated_delivery": "2026-09-26",
+  "address": "上海市浦东新区张江路 88 号 3 号楼 502",
   "timeline": [
     {
-      "at": "2026-09-15 16:49",
+      "at": "2026-09-21 12:21",
       "text": "订单创建，等待付款",
       "type": "order"
     },
     {
-      "at": "2026-09-15 17:01",
+      "at": "2026-09-21 12:33",
       "text": "支付成功",
       "type": "order"
     },
     {
-      "at": "2026-09-16 19:49",
-      "text": "顺丰速运 已揽收，运单号 SF202609150907",
+      "at": "2026-09-22 14:21",
+      "text": "顺丰速运 已揽收，运单号 SF202609210903",
       "type": "ship"
     },
     {
-      "at": "2026-09-17 01:49",
+      "at": "2026-09-22 19:21",
       "text": "已从【发货仓】发出",
       "type": "ship"
     },
     {
-      "at": "2026-09-18 01:49",
+      "at": "2026-09-23 19:21",
       "text": "到达【区域分拨中心】",
-      "type": "ship"
-    },
-    {
-      "at": "2026-09-19 01:49",
-      "text": "到达【城市转运中心】",
       "type": "ship"
     }
   ],

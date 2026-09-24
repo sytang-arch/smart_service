@@ -1,7 +1,8 @@
 {
   "demo_name": "智能客服工作台 · Dify Agent Demo",
   "scenario": "数码 3C 电商在线客服",
-  "data_as_of": "2026-09-22",
+  "data_as_of": "2026-09-24",
+  "data_basis": "所有日期都是「距生成日 N 天」的相对偏移，随生成日滚动，不会过期",
   "customers": 6,
   "orders": 30,
   "products": 12,

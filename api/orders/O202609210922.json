@@ -1,59 +1,54 @@
 {
-  "order_id": "O202609180928",
-  "customer_id": "C1006",
+  "order_id": "O202609210922",
+  "customer_id": "C1005",
   "status": "in_transit",
   "status_label": "运输中",
-  "created_at": "2026-09-18 10:16",
-  "paid_at": "2026-09-18 10:28",
-  "shipped_at": "2026-09-19 13:16",
+  "created_at": "2026-09-21 13:34",
+  "paid_at": "2026-09-21 13:46",
+  "shipped_at": "2026-09-22 15:34",
   "signed_at": null,
   "completed_at": null,
-  "amount": 5499.0,
+  "amount": 2699.0,
   "currency": "CNY",
   "pay_method": "在线支付（支付宝）",
   "items": [
     {
-      "sku": "SKU-D001",
-      "name": "轻风 14 英寸轻薄笔记本",
-      "price": 5499.0,
+      "sku": "SKU-C001",
+      "name": "云阅 11 英寸平板电脑",
+      "price": 2699.0,
       "qty": 1,
-      "subtotal": 5499.0
+      "subtotal": 2699.0
     }
   ],
-  "carrier": "顺丰速运",
-  "carrier_phone": "95338",
-  "tracking_no": "SF202609180928",
-  "estimated_delivery": "2026-09-22",
-  "address": "杭州市西湖区文三路 259 号 2 幢 1602",
+  "carrier": "京东物流",
+  "carrier_phone": "950616",
+  "tracking_no": "JD202609210922",
+  "estimated_delivery": "2026-09-26",
+  "address": "深圳市南山区科苑南路 2666 号 5 栋 801",
   "timeline": [
     {
-      "at": "2026-09-18 10:16",
+      "at": "2026-09-21 13:34",
       "text": "订单创建，等待付款",
       "type": "order"
     },
     {
-      "at": "2026-09-18 10:28",
+      "at": "2026-09-21 13:46",
       "text": "支付成功",
       "type": "order"
     },
     {
-      "at": "2026-09-19 13:16",
-      "text": "顺丰速运 已揽收，运单号 SF202609180928",
+      "at": "2026-09-22 15:34",
+      "text": "京东物流 已揽收，运单号 JD202609210922",
       "type": "ship"
     },
     {
-      "at": "2026-09-19 19:16",
+      "at": "2026-09-22 20:34",
       "text": "已从【发货仓】发出",
       "type": "ship"
     },
     {
-      "at": "2026-09-20 19:16",
+      "at": "2026-09-23 20:34",
       "text": "到达【区域分拨中心】",
-      "type": "ship"
-    },
-    {
-      "at": "2026-09-21 19:16",
-      "text": "到达【城市转运中心】",
       "type": "ship"
     }
   ],

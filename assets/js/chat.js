@@ -303,7 +303,15 @@
     var oid = extractOrderId(q);
     if (oid) {
       var o = S.getOrder(oid);
-      if (!o) return { answer: "没有查到订单 **" + oid + "**，请确认订单号是否完整（形如 O202609210901）。", meta: meta };
+      if (!o) {
+        var own = S.ordersOf(me.customer_id);
+        return {
+          answer: "没有查到订单 **" + oid + "**。请核对订单号"
+            + (own.length ? "，您名下最近一笔是 `" + own[0].order_id + "`" : "")
+            + "。",
+          meta: meta,
+        };
+      }
       if (o.customer_id !== me.customer_id) {
         return {
           answer: "抱歉，订单 **" + oid + "** 不属于当前账户（" + me.name + " / " + me.customer_id + "）。\n\n为了保护账户隐私，我无法查看或操作其他账户的订单。如果是您本人其他账号下的订单，请切换身份后再试。",
@@ -422,8 +430,16 @@
       return { answer: "您好，我是" + (cfg.ASSISTANT_NAME || "在线客服") + "。当前身份：**" + me.name + "**（" + me.level + "）。\n\n我可以帮您：查订单、看物流、取消订单、申请退款/换货、核对售后进度。请直接描述问题～", meta: meta };
     }
 
+    // 兜底话术里的示例订单号必须取自当前身份的真实订单 ——
+    // 数据是按天生成的，写死一个订单号过几天就成了不存在的单号。
+    var cancelable = S.ordersOf(me.customer_id).filter(function (x) {
+      return x.available_actions.indexOf("cancel_order") > -1;
+    });
     return {
-      answer: "我没太理解您的意思。可以试试这样问：\n- 「我的订单到哪了？」\n- 「帮我取消 O202609210901」\n- 「耳机拆过了还能退吗？」\n- 「退款多久到账？」\n\n（当前处于规则兜底模式，回答由前端规则生成；连接 Dify Agent 后由大模型处理开放式问题。）",
+      answer: "我没太理解您的意思。可以试试这样问：\n- 「我的订单到哪了？」\n- 「"
+        + (cancelable.length ? "帮我取消 " + cancelable[0].order_id : "我最近买了什么") + "」\n"
+        + "- 「耳机拆过了还能退吗？」\n- 「退款多久到账？」\n\n"
+        + "（当前处于规则兜底模式，回答由前端规则生成；连接 Dify Agent 后由大模型处理开放式问题。）",
       meta: meta,
     };
   }

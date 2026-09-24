@@ -1,58 +1,58 @@
 {
-  "order_id": "O202609140903",
-  "customer_id": "C1001",
+  "order_id": "O202609200928",
+  "customer_id": "C1006",
   "status": "in_transit",
   "status_label": "运输中",
-  "created_at": "2026-09-14 12:21",
-  "paid_at": "2026-09-14 12:33",
-  "shipped_at": "2026-09-15 15:21",
+  "created_at": "2026-09-20 10:16",
+  "paid_at": "2026-09-20 10:28",
+  "shipped_at": "2026-09-21 12:16",
   "signed_at": null,
   "completed_at": null,
-  "amount": 298.0,
+  "amount": 5499.0,
   "currency": "CNY",
-  "pay_method": "在线支付（微信）",
+  "pay_method": "在线支付（支付宝）",
   "items": [
     {
-      "sku": "SKU-E001",
-      "name": "极速 65W 氮化镓充电器",
-      "price": 149.0,
-      "qty": 2,
-      "subtotal": 298.0
+      "sku": "SKU-D001",
+      "name": "轻风 14 英寸轻薄笔记本",
+      "price": 5499.0,
+      "qty": 1,
+      "subtotal": 5499.0
     }
   ],
   "carrier": "顺丰速运",
   "carrier_phone": "95338",
-  "tracking_no": "SF202609140903",
-  "estimated_delivery": "2026-09-18",
-  "address": "上海市浦东新区张江路 88 号 3 号楼 502",
+  "tracking_no": "SF202609200928",
+  "estimated_delivery": "2026-09-25",
+  "address": "杭州市西湖区文三路 259 号 2 幢 1602",
   "timeline": [
     {
-      "at": "2026-09-14 12:21",
+      "at": "2026-09-20 10:16",
       "text": "订单创建，等待付款",
       "type": "order"
     },
     {
-      "at": "2026-09-14 12:33",
+      "at": "2026-09-20 10:28",
       "text": "支付成功",
       "type": "order"
     },
     {
-      "at": "2026-09-15 15:21",
-      "text": "顺丰速运 已揽收，运单号 SF202609140903",
+      "at": "2026-09-21 12:16",
+      "text": "顺丰速运 已揽收，运单号 SF202609200928",
       "type": "ship"
     },
     {
-      "at": "2026-09-15 21:21",
+      "at": "2026-09-21 17:16",
       "text": "已从【发货仓】发出",
       "type": "ship"
     },
     {
-      "at": "2026-09-16 21:21",
+      "at": "2026-09-22 17:16",
       "text": "到达【区域分拨中心】",
       "type": "ship"
     },
     {
-      "at": "2026-09-17 21:21",
+      "at": "2026-09-23 17:16",
       "text": "到达【城市转运中心】",
       "type": "ship"
     }

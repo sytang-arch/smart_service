@@ -1,15 +1,15 @@
 {
   "customer_id": "C1004",
   "customer_name": "刘敏",
-  "data_as_of": "2026-09-22",
+  "data_as_of": "2026-09-24",
   "count": 5,
   "orders": [
     {
-      "order_id": "O202609210916",
+      "order_id": "O202609230916",
       "customer_id": "C1004",
       "status": "pending_payment",
       "status_label": "待付款",
-      "created_at": "2026-09-21 16:52",
+      "created_at": "2026-09-23 16:52",
       "paid_at": null,
       "shipped_at": null,
       "signed_at": null,
@@ -33,12 +33,12 @@
       "address": "成都市武侯区天府大道北段 1480 号 9 栋 1103",
       "timeline": [
         {
-          "at": "2026-09-21 16:52",
+          "at": "2026-09-23 16:52",
           "text": "订单创建，等待付款",
           "type": "order"
         },
         {
-          "at": "2026-09-22 16:52",
+          "at": "2026-09-23 18:52",
           "text": "已发送付款提醒，24 小时内未付款将自动关闭订单",
           "type": "warn"
         }
@@ -58,12 +58,12 @@
       "internal_note": ""
     },
     {
-      "order_id": "O202609180917",
+      "order_id": "O202609230917",
       "customer_id": "C1004",
       "status": "paid",
       "status_label": "待发货（已付款）",
-      "created_at": "2026-09-18 17:59",
-      "paid_at": "2026-09-18 18:11",
+      "created_at": "2026-09-23 17:59",
+      "paid_at": "2026-09-23 18:11",
       "shipped_at": null,
       "signed_at": null,
       "completed_at": null,
@@ -86,17 +86,17 @@
       "address": "成都市武侯区天府大道北段 1480 号 9 栋 1103",
       "timeline": [
         {
-          "at": "2026-09-18 17:59",
+          "at": "2026-09-23 17:59",
           "text": "订单创建，等待付款",
           "type": "order"
         },
         {
-          "at": "2026-09-18 18:11",
+          "at": "2026-09-23 18:11",
           "text": "支付成功",
           "type": "order"
         },
         {
-          "at": "2026-09-18 19:59",
+          "at": "2026-09-23 19:59",
           "text": "仓库已接单，正在拣货打包",
           "type": "info"
         }
@@ -116,13 +116,13 @@
       "internal_note": ""
     },
     {
-      "order_id": "O202609130918",
+      "order_id": "O202609200918",
       "customer_id": "C1004",
       "status": "in_transit",
       "status_label": "运输中",
-      "created_at": "2026-09-13 09:06",
-      "paid_at": "2026-09-13 09:18",
-      "shipped_at": "2026-09-14 12:06",
+      "created_at": "2026-09-20 09:06",
+      "paid_at": "2026-09-20 09:18",
+      "shipped_at": "2026-09-21 11:06",
       "signed_at": null,
       "completed_at": null,
       "amount": 149.0,
@@ -139,38 +139,43 @@
       ],
       "carrier": "中通快递",
       "carrier_phone": "95311",
-      "tracking_no": "ZTO202609130918",
-      "estimated_delivery": "2026-09-17",
+      "tracking_no": "ZTO202609200918",
+      "estimated_delivery": "2026-09-25",
       "address": "成都市武侯区天府大道北段 1480 号 9 栋 1103",
       "timeline": [
         {
-          "at": "2026-09-13 09:06",
+          "at": "2026-09-20 09:06",
           "text": "订单创建，等待付款",
           "type": "order"
         },
         {
-          "at": "2026-09-13 09:18",
+          "at": "2026-09-20 09:18",
           "text": "支付成功",
           "type": "order"
         },
         {
-          "at": "2026-09-14 12:06",
-          "text": "中通快递 已揽收，运单号 ZTO202609130918",
+          "at": "2026-09-21 11:06",
+          "text": "中通快递 已揽收，运单号 ZTO202609200918",
           "type": "ship"
         },
         {
-          "at": "2026-09-14 18:06",
+          "at": "2026-09-21 16:06",
           "text": "已从【发货仓】发出",
           "type": "ship"
         },
         {
-          "at": "2026-09-15 18:06",
+          "at": "2026-09-22 16:06",
           "text": "到达【区域分拨中心】",
           "type": "ship"
         },
         {
-          "at": "2026-09-16 18:06",
+          "at": "2026-09-23 16:06",
           "text": "到达【城市转运中心】",
+          "type": "ship"
+        },
+        {
+          "at": "2026-09-24 16:06",
+          "text": "派送中，配送员正在为您派送",
           "type": "ship"
         }
       ],
@@ -186,17 +191,17 @@
         "查询物流",
         "申报物流异常"
       ],
-      "internal_note": "物流停滞：最后更新 2026-09-17"
+      "internal_note": "物流停滞：长时间无新物流节点"
     },
     {
-      "order_id": "O202609020919",
+      "order_id": "O202609040919",
       "customer_id": "C1004",
       "status": "delivered",
       "status_label": "已签收",
-      "created_at": "2026-09-02 10:13",
-      "paid_at": "2026-09-02 10:25",
-      "shipped_at": "2026-09-03 13:13",
-      "signed_at": "2026-09-06 14:32",
+      "created_at": "2026-09-04 10:13",
+      "paid_at": "2026-09-04 10:25",
+      "shipped_at": "2026-09-05 12:13",
+      "signed_at": "2026-09-08 14:32",
       "completed_at": null,
       "amount": 1299.0,
       "currency": "CNY",
@@ -212,55 +217,55 @@
       ],
       "carrier": "顺丰速运",
       "carrier_phone": "95338",
-      "tracking_no": "SF202609020919",
+      "tracking_no": "SF202609040919",
       "estimated_delivery": null,
       "address": "成都市武侯区天府大道北段 1480 号 9 栋 1103",
       "timeline": [
         {
-          "at": "2026-09-02 10:13",
+          "at": "2026-09-04 10:13",
           "text": "订单创建，等待付款",
           "type": "order"
         },
         {
-          "at": "2026-09-02 10:25",
+          "at": "2026-09-04 10:25",
           "text": "支付成功",
           "type": "order"
         },
         {
-          "at": "2026-09-03 13:13",
-          "text": "顺丰速运 已揽收，运单号 SF202609020919",
+          "at": "2026-09-05 12:13",
+          "text": "顺丰速运 已揽收，运单号 SF202609040919",
           "type": "ship"
         },
         {
-          "at": "2026-09-03 19:13",
+          "at": "2026-09-05 23:21",
           "text": "已从【发货仓】发出",
           "type": "ship"
         },
         {
-          "at": "2026-09-04 19:13",
+          "at": "2026-09-06 17:56",
           "text": "到达【区域分拨中心】",
           "type": "ship"
         },
         {
-          "at": "2026-09-05 19:13",
+          "at": "2026-09-07 12:31",
           "text": "到达【城市转运中心】",
           "type": "ship"
         },
         {
-          "at": "2026-09-06 19:13",
+          "at": "2026-09-08 07:06",
           "text": "派送中，配送员正在为您派送",
           "type": "ship"
         },
         {
-          "at": "2026-09-06 14:32",
+          "at": "2026-09-08 14:32",
           "text": "已签收，感谢使用",
           "type": "ok"
         }
       ],
       "after_sale": null,
       "refund_eligible": false,
-      "refund_deadline": "2026-09-13",
-      "refund_note": "已超出 7 天无理由退货期（签收 2026-09-06）",
+      "refund_deadline": "2026-09-15",
+      "refund_note": "已超出 7 天无理由退货期（签收 2026-09-08）",
       "available_actions": [
         "track_logistics",
         "apply_exchange"
@@ -269,15 +274,15 @@
         "查询物流",
         "申请换货"
       ],
-      "internal_note": "签收 2026-09-06"
+      "internal_note": ""
     },
     {
-      "order_id": "O202606200920",
+      "order_id": "O202606220920",
       "customer_id": "C1004",
       "status": "cancelled",
       "status_label": "已取消",
-      "created_at": "2026-06-20 11:20",
-      "paid_at": "2026-06-20 11:32",
+      "created_at": "2026-06-22 11:20",
+      "paid_at": "2026-06-22 11:32",
       "shipped_at": null,
       "signed_at": null,
       "completed_at": null,
@@ -300,17 +305,17 @@
       "address": "成都市武侯区天府大道北段 1480 号 9 栋 1103",
       "timeline": [
         {
-          "at": "2026-06-20 11:20",
+          "at": "2026-06-22 11:20",
           "text": "订单创建，等待付款",
           "type": "order"
         },
         {
-          "at": "2026-06-20 11:32",
+          "at": "2026-06-22 11:32",
           "text": "支付成功",
           "type": "order"
         },
         {
-          "at": "2026-06-20 17:20",
+          "at": "2026-06-22 17:20",
           "text": "订单已取消（未发货），款项原路退回",
           "type": "warn"
         }

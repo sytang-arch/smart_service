@@ -23,7 +23,9 @@ window.CS_CONFIG = {
      三种填法：
        · 本地跑代理：      "http://localhost:8787"
        · 部署 Cloudflare Worker： "https://<你的-worker>.workers.dev"
-       · 部署到任意 Node 主机：   "https://你的域名"
+         （代码见 server/worker.js）
+       · 部署到腾讯云 CloudBase 云函数： "https://<环境ID>.service.tcloudbase.com/proxy"
+         （代码见 server/cloudbase.js；国内直连、免备案，面试官在国内时用这个）
      留空 = 页面进入"规则兜底模式"（不连 Dify，用前端规则回答常见问题，
      保证分享出去的链接点开永远有反应，而不是一个死掉的对话框）。
      ---------------------------------------------------------------------- */

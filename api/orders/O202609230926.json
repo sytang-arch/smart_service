@@ -1,38 +1,38 @@
 {
-  "order_id": "O202609210916",
-  "customer_id": "C1004",
+  "order_id": "O202609230926",
+  "customer_id": "C1006",
   "status": "pending_payment",
   "status_label": "待付款",
-  "created_at": "2026-09-21 16:52",
+  "created_at": "2026-09-23 17:02",
   "paid_at": null,
   "shipped_at": null,
   "signed_at": null,
   "completed_at": null,
-  "amount": 399.0,
+  "amount": 1399.0,
   "currency": "CNY",
   "pay_method": "在线支付（支付宝）",
   "items": [
     {
-      "sku": "SKU-C002",
-      "name": "云阅平板磁吸键盘保护套",
-      "price": 399.0,
+      "sku": "SKU-H001",
+      "name": "视界 27 英寸 2K 显示器",
+      "price": 1399.0,
       "qty": 1,
-      "subtotal": 399.0
+      "subtotal": 1399.0
     }
   ],
   "carrier": null,
   "carrier_phone": null,
   "tracking_no": null,
   "estimated_delivery": null,
-  "address": "成都市武侯区天府大道北段 1480 号 9 栋 1103",
+  "address": "杭州市西湖区文三路 259 号 2 幢 1602",
   "timeline": [
     {
-      "at": "2026-09-21 16:52",
+      "at": "2026-09-23 17:02",
       "text": "订单创建，等待付款",
       "type": "order"
     },
     {
-      "at": "2026-09-22 16:52",
+      "at": "2026-09-23 19:02",
       "text": "已发送付款提醒，24 小时内未付款将自动关闭订单",
       "type": "warn"
     }

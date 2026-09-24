@@ -1,12 +1,12 @@
 {
-  "order_id": "O202609160929",
+  "order_id": "O202609180929",
   "customer_id": "C1006",
   "status": "delivered",
   "status_label": "已签收",
-  "created_at": "2026-09-16 11:23",
-  "paid_at": "2026-09-16 11:35",
-  "shipped_at": "2026-09-17 14:23",
-  "signed_at": "2026-09-20 14:32",
+  "created_at": "2026-09-18 11:23",
+  "paid_at": "2026-09-18 11:35",
+  "shipped_at": "2026-09-19 13:23",
+  "signed_at": "2026-09-22 14:32",
   "completed_at": null,
   "amount": 3299.0,
   "currency": "CNY",
@@ -22,54 +22,54 @@
   ],
   "carrier": "顺丰速运",
   "carrier_phone": "95338",
-  "tracking_no": "SF202609160929",
+  "tracking_no": "SF202609180929",
   "estimated_delivery": null,
   "address": "杭州市西湖区文三路 259 号 2 幢 1602",
   "timeline": [
     {
-      "at": "2026-09-16 11:23",
+      "at": "2026-09-18 11:23",
       "text": "订单创建，等待付款",
       "type": "order"
     },
     {
-      "at": "2026-09-16 11:35",
+      "at": "2026-09-18 11:35",
       "text": "支付成功",
       "type": "order"
     },
     {
-      "at": "2026-09-17 14:23",
-      "text": "顺丰速运 已揽收，运单号 SF202609160929",
+      "at": "2026-09-19 13:23",
+      "text": "顺丰速运 已揽收，运单号 SF202609180929",
       "type": "ship"
     },
     {
-      "at": "2026-09-17 20:23",
+      "at": "2026-09-20 00:21",
       "text": "已从【发货仓】发出",
       "type": "ship"
     },
     {
-      "at": "2026-09-18 20:23",
+      "at": "2026-09-20 18:38",
       "text": "到达【区域分拨中心】",
       "type": "ship"
     },
     {
-      "at": "2026-09-19 20:23",
+      "at": "2026-09-21 12:55",
       "text": "到达【城市转运中心】",
       "type": "ship"
     },
     {
-      "at": "2026-09-20 20:23",
+      "at": "2026-09-22 07:13",
       "text": "派送中，配送员正在为您派送",
       "type": "ship"
     },
     {
-      "at": "2026-09-20 14:32",
+      "at": "2026-09-22 14:32",
       "text": "已签收，感谢使用",
       "type": "ok"
     }
   ],
   "after_sale": null,
   "refund_eligible": true,
-  "refund_deadline": "2026-09-27",
+  "refund_deadline": "2026-09-29",
   "refund_note": "签收后 2 天内，可享 7 天无理由退货",
   "available_actions": [
     "apply_refund",
@@ -81,5 +81,5 @@
     "查询物流",
     "申请换货"
   ],
-  "internal_note": "签收 2026-09-20"
+  "internal_note": ""
 }

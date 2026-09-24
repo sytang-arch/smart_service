@@ -1,43 +1,43 @@
 {
-  "order_id": "O202609200927",
-  "customer_id": "C1006",
+  "order_id": "O202609230906",
+  "customer_id": "C1002",
   "status": "paid",
   "status_label": "待发货（已付款）",
-  "created_at": "2026-09-20 09:09",
-  "paid_at": "2026-09-20 09:21",
+  "created_at": "2026-09-23 15:42",
+  "paid_at": "2026-09-23 15:54",
   "shipped_at": null,
   "signed_at": null,
   "completed_at": null,
-  "amount": 1598.0,
+  "amount": 5499.0,
   "currency": "CNY",
-  "pay_method": "在线支付（微信）",
+  "pay_method": "在线支付（支付宝）",
   "items": [
     {
-      "sku": "SKU-B001",
-      "name": "声动 Air 真无线降噪耳机",
-      "price": 799.0,
-      "qty": 2,
-      "subtotal": 1598.0
+      "sku": "SKU-D001",
+      "name": "轻风 14 英寸轻薄笔记本",
+      "price": 5499.0,
+      "qty": 1,
+      "subtotal": 5499.0
     }
   ],
   "carrier": null,
   "carrier_phone": null,
   "tracking_no": null,
   "estimated_delivery": null,
-  "address": "杭州市西湖区文三路 259 号 2 幢 1602",
+  "address": "北京市海淀区中关村大街 27 号 A 座 1801",
   "timeline": [
     {
-      "at": "2026-09-20 09:09",
+      "at": "2026-09-23 15:42",
       "text": "订单创建，等待付款",
       "type": "order"
     },
     {
-      "at": "2026-09-20 09:21",
+      "at": "2026-09-23 15:54",
       "text": "支付成功",
       "type": "order"
     },
     {
-      "at": "2026-09-20 11:09",
+      "at": "2026-09-23 17:42",
       "text": "仓库已接单，正在拣货打包",
       "type": "info"
     }
