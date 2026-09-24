@@ -37,9 +37,21 @@
     return window.CSStore ? window.CSStore.money(n) : Number(n).toFixed(2);
   }
 
-  /** 极简 Markdown 渲染（先转义再替换，避免 XSS） */
+  /** 剥掉模型泄露出来的思考段。
+      回复节点若用了带思维链的模型，Dify 会把 <think>…</think>（内含
+      <!--dify-deepseek-reasoning--> 标记）和正式回答一起塞进 answer，
+      不剥掉的话用户看到的是模型的内心独白。 */
+  function stripThink(text) {
+    var t = String(text == null ? "" : text);
+    t = t.replace(/<!--[\s\S]*?-->/g, "");
+    t = t.replace(/<think(?:ing)?[^>]*>[\s\S]*?<\/think(?:ing)?\s*>/gi, "");
+    t = t.replace(/<think(?:ing)?[^>]*>[\s\S]*$/gi, "");   // 流式过程中还没闭合的
+    return t.replace(/^\s+/, "");
+  }
+
+  /** 极简 Markdown 渲染（先剥思考段、再转义，避免 XSS） */
   function md(text) {
-    var t = esc(text);
+    var t = esc(stripThink(text));
     t = t.replace(/```([\s\S]*?)```/g, function (_, code) { return "<pre><code>" + code.trim() + "</code></pre>"; });
     t = t.replace(/`([^`\n]+)`/g, "<code>$1</code>");
     t = t.replace(/\*\*([^*\n]+)\*\*/g, "<b>$1</b>");

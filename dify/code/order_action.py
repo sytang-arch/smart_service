@@ -77,6 +77,10 @@ INTENT_TO_ACTION = {
     "query_logistics": LOGISTICS,
 }
 
+# 兜底识别用的枚举表：长串优先，避免 "logistics_exception" 被 "query_logistics"
+# 这类短串抢先命中。
+_INTENT_KEYS = sorted(INTENT_TO_ACTION.keys(), key=len, reverse=True)
+
 ACTION_LABEL = {
     "cancel_order": "取消订单",
     "apply_refund": "申请退款",
@@ -162,6 +166,67 @@ def _locate(mine, want_oid, ok_status=None):
     return None
 
 
+def _strip_wrappers(raw):
+    """剥掉意图节点输出常见的两层包裹：思考段与 markdown 代码围栏。
+
+    意图节点很容易被配上带思维链的模型（deepseek-reasoner 之类），输出形如
+        <think>用户在问物流，选 query_logistics</think>
+        ```json
+        {"intent": "query_logistics", ...}
+        ```
+    只要有一层没剥掉，"以 { 开头才 json.loads" 的判断就落空，
+    整条链路会退化成 UNKNOWN_INTENT —— 模型明明答对了，用户却看到"我没太理解"。
+
+    纯字符串实现，不依赖 re（Dify 沙箱对库的放行是有限的）。
+    """
+    t = raw or ""
+    for tag in ("think", "thinking"):
+        while True:
+            low = t.lower()
+            i = low.find("<" + tag)
+            if i == -1:
+                break
+            close = "</" + tag + ">"
+            j = low.find(close, i)
+            if j == -1:
+                break                # 未闭合：交给 _find_intent_json 从末尾回溯，
+                                     # 直接把尾巴丢掉反而会把后面的 JSON 一起吞掉
+            t = t[:i] + t[j + len(close):]
+    for lang in ("json", "JSON", "Json", "python"):
+        t = t.replace("```" + lang, "")
+    return t.replace("```", "").strip()
+
+
+def _find_intent_json(text):
+    """从文本里取出意图 JSON。
+
+    从最后一个花括号往前试，而不是"从第一个 { 到最后一个 }"：
+    模型的最终答案总在末尾，这样思考段里的花括号、JSON 前后的说明文字
+    都不会干扰；JSON 里若还有嵌套对象也能逐层往外找回来。
+    """
+    if not text:
+        return {}
+    fallback = {}
+    end = text.rfind("}")
+    for _ in range(8):
+        if end == -1:
+            break
+        start = text.rfind("{", 0, end + 1)
+        if start == -1:
+            break
+        try:
+            loaded = json.loads(text[start:end + 1])
+            if isinstance(loaded, dict):
+                if "intent" in loaded:
+                    return loaded
+                if not fallback:
+                    fallback = loaded
+        except Exception:
+            pass
+        end = text.rfind("}", 0, start)
+    return fallback
+
+
 # ----------------------------------------------------------------- 主函数 ----
 def main(customer_id: str, action: str, orders_json: str = "",
          current_order_id: str = "") -> dict:
@@ -170,17 +235,26 @@ def main(customer_id: str, action: str, orders_json: str = "",
     if not customer_id:
         return _fail("没有拿到您的账户信息，请刷新页面后重新发起对话。", reason="NO_IDENTITY")
 
-    # ---- 0. 解析 action：既接受整段意图 JSON，也接受裸枚举 -------------------
-    intent, payload = "", {}
-    raw = (action or "").strip()
-    if raw.startswith("{"):
-        try:
-            payload = json.loads(raw)
-        except Exception:
-            payload = {}
+    # ---- 0. 解析 action：吃下意图节点的各种真实输出形态 -----------------------
+    # 期望是纯 JSON，但下面三种变形都要接住，否则整条链路退化成 UNKNOWN_INTENT：
+    #   · ```json 代码块包裹
+    #   · 推理模型加在前面的 <think>…</think> 思考段
+    #   · JSON 前后多了一句说明文字（或被截断）
+    raw = _strip_wrappers(action)
+    intent = ""
+    payload = _find_intent_json(raw)
+    if payload:
         intent = str(payload.get("intent") or "").strip()
+    if not intent and raw in INTENT_TO_ACTION:
+        intent = raw                                   # 裸枚举，原样接受
     if not intent:
-        intent = raw
+        low = raw.lower()                              # 最后兜底：在文本里认已知枚举
+        for key in _INTENT_KEYS:
+            if key in low:
+                intent = key
+                break
+    if not intent:
+        intent = raw                                   # 交给下面报 UNKNOWN_INTENT
     act = INTENT_TO_ACTION.get(intent, intent)
 
     # 目标订单号：用户当场说的（意图里抽出来的）优先，其次才是页面上正在看的那笔
