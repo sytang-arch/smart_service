@@ -1,58 +1,58 @@
 {
-  "order_id": "O202609160904",
-  "customer_id": "C1001",
+  "order_id": "O202609160913",
+  "customer_id": "C1003",
   "status": "delivered",
   "status_label": "已签收",
-  "created_at": "2026-09-16 13:28",
-  "paid_at": "2026-09-16 13:40",
-  "shipped_at": "2026-09-17 15:28",
+  "created_at": "2026-09-16 13:31",
+  "paid_at": "2026-09-16 13:43",
+  "shipped_at": "2026-09-17 15:31",
   "signed_at": "2026-09-20 14:32",
   "completed_at": null,
-  "amount": 1099.0,
+  "amount": 799.0,
   "currency": "CNY",
-  "pay_method": "在线支付（支付宝）",
+  "pay_method": "在线支付（微信）",
   "items": [
     {
-      "sku": "SKU-F001",
-      "name": "律动 Watch S2 智能手表",
-      "price": 1099.0,
+      "sku": "SKU-B001",
+      "name": "声动 Air 真无线降噪耳机",
+      "price": 799.0,
       "qty": 1,
-      "subtotal": 1099.0
+      "subtotal": 799.0
     }
   ],
   "carrier": "中通快递",
   "carrier_phone": "95311",
-  "tracking_no": "ZTO202609160904",
+  "tracking_no": "ZTO202609160913",
   "estimated_delivery": null,
-  "address": "上海市浦东新区张江路 88 号 3 号楼 502",
+  "address": "广州市天河区体育西路 103 号 2201",
   "timeline": [
     {
-      "at": "2026-09-16 13:28",
+      "at": "2026-09-16 13:31",
       "text": "订单创建，等待付款",
       "type": "order"
     },
     {
-      "at": "2026-09-16 13:40",
+      "at": "2026-09-16 13:43",
       "text": "支付成功",
       "type": "order"
     },
     {
-      "at": "2026-09-17 15:28",
-      "text": "中通快递 已揽收，运单号 ZTO202609160904",
+      "at": "2026-09-17 15:31",
+      "text": "中通快递 已揽收，运单号 ZTO202609160913",
       "type": "ship"
     },
     {
-      "at": "2026-09-18 02:07",
+      "at": "2026-09-18 02:10",
       "text": "已从【发货仓】发出",
       "type": "ship"
     },
     {
-      "at": "2026-09-18 19:53",
+      "at": "2026-09-18 19:55",
       "text": "到达【区域分拨中心】",
       "type": "ship"
     },
     {
-      "at": "2026-09-19 13:39",
+      "at": "2026-09-19 13:40",
       "text": "到达【城市转运中心】",
       "type": "ship"
     },
@@ -68,16 +68,14 @@
     }
   ],
   "after_sale": null,
-  "refund_eligible": true,
+  "refund_eligible": false,
   "refund_deadline": "2026-09-27",
-  "refund_note": "签收后 4 天内，可享 7 天无理由退货",
+  "refund_note": "已超出 7 天无理由退货期（签收 2026-09-20）",
   "available_actions": [
-    "apply_refund",
     "track_logistics",
     "apply_exchange"
   ],
   "available_action_labels": [
-    "申请退款",
     "查询物流",
     "申请换货"
   ],

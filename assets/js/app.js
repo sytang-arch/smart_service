@@ -330,7 +330,12 @@
         : "本地数据包已加载（data.bundle.js 兜底）";
       pill.className = "pill " + (S.source === "api" ? "pill-ok" : "pill-warn");
 
-      $("asof").textContent = S.meta ? S.meta.data_as_of : "—";
+      // 数据是静态的，加载时会把日期顺延到今天（见 store.js 的 rebase 段）。
+      // 顺延量>0 时在基准日后加一句说明 —— 这本身就是个可讲的设计点：
+      // 分享出去的链接放几周也不会出现"预计送达已经过去"的自相矛盾。
+      var asof = S.meta ? S.meta.data_as_of : "—";
+      if (S.rebasedDays > 0) asof += "（数据已自动顺延 " + S.rebasedDays + " 天）";
+      $("asof").textContent = asof;
       renderIdentity();
       renderOrders();
       renderDetail();

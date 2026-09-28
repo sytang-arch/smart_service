@@ -18,6 +18,7 @@
     orders: [],
     kb: null,
     source: "unknown",          // "api" | "bundle"
+    rebasedDays: 0,             // 数据被顺延了多少天（0 = 本来就是今天的）
     currentCustomerId: null,
     selectedOrderId: null,
     overrides: {},
@@ -53,6 +54,18 @@
     },
 
     _ingest: function (meta, customers, products, orders, kb, source) {
+      // 先把整份数据里的日期顺延到"今天" —— 静态托管的数据是某一天生成的，
+      // 不顺延的话，分享出去的链接放几周就会自相矛盾（详见文件末尾 rebase 段）。
+      var shift = rebaseStartDate(meta);
+      if (shift) {
+        meta = shiftValue(meta, shift.days);
+        customers = shiftValue(customers, shift.days);
+        products = shiftValue(products, shift.days);
+        orders = shiftValue(orders, shift.days);
+        kb = shiftValue(kb, shift.days);
+      }
+      this.rebasedDays = shift ? shift.days : 0;
+
       this.meta = meta;
       this.customers = customers || [];
       this.products = products || [];
@@ -261,8 +274,90 @@
     return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
   }
 
+  /* ========================================================================
+     日期顺延 —— 让静态数据"永不过期"
+     ------------------------------------------------------------------------
+     问题：数据是由 tools/generate_data.py 在**某一天**生成的，生成完就固化在
+     文件里。分享链接放几周之后，页面会出现「预计送达 9-27、今天已经 10-08」
+     「签收 4 天前、7 天无理由期早就过了」这类自相矛盾 —— 一眼就假。
+     重新生成只能解决"生成那天"的问题：用户不会为了发个链接去重跑脚本。
+
+     做法：数据里带着生成日 meta.data_as_of，加载时算出差值 N 天，把整份数据
+     里的**所有日期串整体平移 N 天**。相对关系（签收后第 4 天、还剩 3 天可退）
+     全部不变，任何一天打开看起来都像"刚发生的事"。
+     顺延是幂等的：平移后 data_as_of 变成今天，再算差值为 0，不会叠加。
+
+     为什么用正则扫字符串、而不是逐字段改：
+     日期散落在 order_id / tracking_no / created_at / timeline[].at /
+     refund_deadline / since / 备注文案里，枚举字段既易漏也易随数据演进失效。
+     数据集里形如日期的串**只有两类**（已全量扫描确认无歧义）：
+       · YYYY-MM-DD（含时间后缀）  例 2026-09-21 12:21
+       · YYYYMMDD（其它 ID 的数字段） 例 O202609210903、ZTO202609160904
+     第二类必须先验月/日合法再平移，否则可能误伤同形的业务数字。
+     ======================================================================== */
+  var RE_HAS_YEAR = /(19|20)\d{2}/;
+  var RE_DASH = /(19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])/g;
+  var RE_COMPACT = /(19|20)\d{6}/g;
+
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+
+  /** 「yyyy-mm-dd」→ 平移后的「yyyy-mm-dd」。取 12:00 为基准时刻，
+   *  避免某些时区在午夜做夏令时切换时把日期推错一天。 */
+  function shiftDash(whole, days) {
+    var t = new Date(+whole.slice(0, 4), +whole.slice(5, 7) - 1, +whole.slice(8, 10), 12);
+    t.setDate(t.getDate() + days);
+    return t.getFullYear() + "-" + pad2(t.getMonth() + 1) + "-" + pad2(t.getDate());
+  }
+
+  /** 从 meta 里取基准日，算出要顺延的天数；不需要顺延则返回 null。 */
+  function rebaseStartDate(meta) {
+    var anchor = (meta && (meta.data_as_of || meta.generated_as_of)) || "";
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(anchor);
+    if (!m) return null;
+    var a = new Date(+m[1], +m[2] - 1, +m[3]);
+    if (isNaN(a.getTime())) return null;
+    var n = new Date();
+    var today = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+    var days = Math.round((today - a) / 86400000);
+    if (!isFinite(days) || days <= 0) return null;   // 基准日就是今天或更晚，不动
+    if (days > 3650) return null;                    // 差得离谱（时钟错乱）宁可不改
+    return { days: days };
+  }
+
+  function shiftString(s, days) {
+    if (!RE_HAS_YEAR.test(s)) return s;              // 快路径：不含年份直接放过
+    return s
+      .replace(RE_DASH, function (whole) { return shiftDash(whole, days); })
+      .replace(RE_COMPACT, function (whole) {
+        var mo = +whole.slice(4, 6), d = +whole.slice(6, 8);
+        if (mo < 1 || mo > 12 || d < 1 || d > 31) return whole;  // 不是日期，原样保留
+        var t = new Date(+whole.slice(0, 4), mo - 1, d, 12);
+        t.setDate(t.getDate() + days);
+        return t.getFullYear() + pad2(t.getMonth() + 1) + pad2(t.getDate());
+      });
+  }
+
+  /** 深拷贝 + 顺延；返回新对象，不改动传入的数据（data.bundle.js 是全局的）。 */
+  function shiftValue(v, days) {
+    if (typeof v === "string") return shiftString(v, days);
+    if (typeof v !== "object" || v === null) return v;
+    if (Array.isArray(v)) {
+      var arr = [];
+      for (var i = 0; i < v.length; i++) arr.push(shiftValue(v[i], days));
+      return arr;
+    }
+    var out = {};
+    for (var k in v) {
+      if (Object.prototype.hasOwnProperty.call(v, k)) out[k] = shiftValue(v[k], days);
+    }
+    return out;
+  }
+
   CSStore.money = money;
   CSStore.nowStr = nowStr;
   CSStore.lastLogistics = lastLogistics;
+  CSStore._shiftString = shiftString;      // 供自测／与 Dify 侧对齐用
+  CSStore._shiftValue = shiftValue;
+  CSStore._rebaseStartDate = rebaseStartDate;
   window.CSStore = CSStore;
 })();

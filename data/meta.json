@@ -1,8 +1,8 @@
 {
   "demo_name": "智能客服工作台 · Dify Agent Demo",
   "scenario": "数码 3C 电商在线客服",
-  "data_as_of": "2026-09-24",
-  "data_basis": "所有日期都是「距生成日 N 天」的相对偏移，随生成日滚动，不会过期",
+  "data_as_of": "2026-09-28",
+  "data_basis": "订单日期按「距基准日 N 天」编排；页面在加载时会把全部日期顺延到打开当天（顺延量 = 今天 - data_as_of），所以链接放多久都不会过期",
   "customers": 6,
   "orders": 30,
   "products": 12,

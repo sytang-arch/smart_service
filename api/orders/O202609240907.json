@@ -1,58 +1,58 @@
 {
-  "order_id": "O202609200928",
-  "customer_id": "C1006",
+  "order_id": "O202609240907",
+  "customer_id": "C1002",
   "status": "in_transit",
   "status_label": "运输中",
-  "created_at": "2026-09-20 10:16",
-  "paid_at": "2026-09-20 10:28",
-  "shipped_at": "2026-09-21 12:16",
+  "created_at": "2026-09-24 16:49",
+  "paid_at": "2026-09-24 17:01",
+  "shipped_at": "2026-09-25 18:49",
   "signed_at": null,
   "completed_at": null,
-  "amount": 5499.0,
+  "amount": 1299.0,
   "currency": "CNY",
-  "pay_method": "在线支付（支付宝）",
+  "pay_method": "在线支付（微信）",
   "items": [
     {
-      "sku": "SKU-D001",
-      "name": "轻风 14 英寸轻薄笔记本",
-      "price": 5499.0,
+      "sku": "SKU-B002",
+      "name": "声动 Studio 头戴式降噪耳机",
+      "price": 1299.0,
       "qty": 1,
-      "subtotal": 5499.0
+      "subtotal": 1299.0
     }
   ],
   "carrier": "顺丰速运",
   "carrier_phone": "95338",
-  "tracking_no": "SF202609200928",
-  "estimated_delivery": "2026-09-25",
-  "address": "杭州市西湖区文三路 259 号 2 幢 1602",
+  "tracking_no": "SF202609240907",
+  "estimated_delivery": "2026-09-29",
+  "address": "北京市海淀区中关村大街 27 号 A 座 1801",
   "timeline": [
     {
-      "at": "2026-09-20 10:16",
+      "at": "2026-09-24 16:49",
       "text": "订单创建，等待付款",
       "type": "order"
     },
     {
-      "at": "2026-09-20 10:28",
+      "at": "2026-09-24 17:01",
       "text": "支付成功",
       "type": "order"
     },
     {
-      "at": "2026-09-21 12:16",
-      "text": "顺丰速运 已揽收，运单号 SF202609200928",
+      "at": "2026-09-25 18:49",
+      "text": "顺丰速运 已揽收，运单号 SF202609240907",
       "type": "ship"
     },
     {
-      "at": "2026-09-21 17:16",
+      "at": "2026-09-25 23:49",
       "text": "已从【发货仓】发出",
       "type": "ship"
     },
     {
-      "at": "2026-09-22 17:16",
+      "at": "2026-09-26 23:49",
       "text": "到达【区域分拨中心】",
       "type": "ship"
     },
     {
-      "at": "2026-09-23 17:16",
+      "at": "2026-09-27 23:49",
       "text": "到达【城市转运中心】",
       "type": "ship"
     }

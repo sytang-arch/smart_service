@@ -25,6 +25,7 @@
 # =============================================================================
 
 import json
+import re
 
 try:                                    # Dify 沙箱只放行有限的库，取不到就降级
     from datetime import datetime as _datetime, timedelta as _timedelta, timezone as _timezone
@@ -153,6 +154,86 @@ def _now_stamp():
         except Exception:
             pass
     return "2026-09-22"
+
+
+# ------------------------------------------------- 日期顺延（静态数据）--------
+# 订单接口是静态托管的，日期在「生成那一天」就固化了。分享链接放几周之后，
+# 会出现「预计送达 9-27、可今天已经 10-08」「签收 4 天前、7 天无理由期早过了」
+# 这类自相矛盾 —— 重新生成脚本解决不了，因为用户不会为了发个链接去重跑脚本。
+# 数据里带着生成日 data_as_of，这里按 (今天 - 生成日) 把订单里的日期串整体平移：
+# 相对关系（签收后第 4 天、还剩 3 天可退）保持不变，哪天打开都像刚发生的事。
+# ⚠ 与前端 assets/js/store.js 里的 rebase 段是同一套规则，改一处要同时改另一处。
+_RE_DASH = re.compile(r"(19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])")
+_RE_COMPACT = re.compile(r"(19|20)\d{6}")
+
+
+def _today():
+    """今天（北京时间）；取不到日期就返回 None，调用方跳过顺延。"""
+    if _datetime is None:
+        return None
+    try:
+        if _timezone and _timedelta:
+            return _datetime.now(_timezone(_timedelta(hours=8))).date()
+    except Exception:
+        pass
+    try:
+        return _datetime.now().date()
+    except Exception:
+        return None
+
+
+def _shift_str(s, days):
+    if "20" not in s:
+        return s
+
+    def _dash(m):
+        try:
+            return (_datetime.strptime(m.group(0), "%Y-%m-%d")
+                    + _timedelta(days=days)).strftime("%Y-%m-%d")
+        except Exception:
+            return m.group(0)
+
+    def _compact(m):
+        w = m.group(0)
+        try:
+            return (_datetime.strptime(w, "%Y%m%d")
+                    + _timedelta(days=days)).strftime("%Y%m%d")
+        except Exception:
+            return w            # 形似日期其实不合法（某些编号），原样保留
+
+    return _RE_COMPACT.sub(_compact, _RE_DASH.sub(_dash, s))
+
+
+def _shift_any(v, days):
+    if isinstance(v, str):
+        return _shift_str(v, days)
+    if isinstance(v, list):
+        return [_shift_any(x, days) for x in v]
+    if isinstance(v, dict):
+        return dict((k, _shift_any(x, days)) for k, x in v.items())
+    return v
+
+
+def _rebase(rows, anchor):
+    """把订单里的日期整体顺延到"今天"；算不出顺延量就原样返回（绝不报错）。
+
+    日期散落在 order_id / tracking_no / created_at / timeline[].at /
+    refund_deadline / 备注文案里，逐字段枚举既易漏、也会随数据演进失效，
+    所以统一扫「形如日期的字符串」：只有 YYYY-MM-DD 与 YYYYMMDD 两类
+    （已全量扫描确认数据中无同形的非日期数字），且都经 strptime 校验。
+    """
+    today = _today()
+    m = _RE_DASH.match(str(anchor or ""))
+    if today is None or not m:
+        return rows
+    try:
+        base = _datetime.strptime(m.group(0), "%Y-%m-%d").date()
+    except Exception:
+        return rows
+    days = (today - base).days
+    if days <= 0 or days > 3650:      # 基准日就是今天/更晚，或时钟离谱 → 不动
+        return rows
+    return _shift_any(rows, days)
 
 
 def _locate(mine, want_oid, ok_status=None):
@@ -286,6 +367,8 @@ def main(customer_id: str, action: str, orders_json: str = "",
     rows = data.get("orders") if isinstance(data, dict) else data
     if not isinstance(rows, list):
         rows = []
+    # 静态数据里的日期先顺延到"今天"，否则签收日/退货截止日会随分享时间推移而失真
+    rows = _rebase(rows, data.get("data_as_of") if isinstance(data, dict) else None)
 
     # 第一道闸：只在当前客户自己的订单里工作
     mine = [o for o in rows

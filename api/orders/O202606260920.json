@@ -1,23 +1,23 @@
 {
-  "order_id": "O202609230916",
+  "order_id": "O202606260920",
   "customer_id": "C1004",
-  "status": "pending_payment",
-  "status_label": "待付款",
-  "created_at": "2026-09-23 16:52",
-  "paid_at": null,
+  "status": "cancelled",
+  "status_label": "已取消",
+  "created_at": "2026-06-26 11:20",
+  "paid_at": "2026-06-26 11:32",
   "shipped_at": null,
   "signed_at": null,
   "completed_at": null,
-  "amount": 399.0,
+  "amount": 5499.0,
   "currency": "CNY",
   "pay_method": "在线支付（支付宝）",
   "items": [
     {
-      "sku": "SKU-C002",
-      "name": "云阅平板磁吸键盘保护套",
-      "price": 399.0,
+      "sku": "SKU-D001",
+      "name": "轻风 14 英寸轻薄笔记本",
+      "price": 5499.0,
       "qty": 1,
-      "subtotal": 399.0
+      "subtotal": 5499.0
     }
   ],
   "carrier": null,
@@ -27,13 +27,18 @@
   "address": "成都市武侯区天府大道北段 1480 号 9 栋 1103",
   "timeline": [
     {
-      "at": "2026-09-23 16:52",
+      "at": "2026-06-26 11:20",
       "text": "订单创建，等待付款",
       "type": "order"
     },
     {
-      "at": "2026-09-23 18:52",
-      "text": "已发送付款提醒，24 小时内未付款将自动关闭订单",
+      "at": "2026-06-26 11:32",
+      "text": "支付成功",
+      "type": "order"
+    },
+    {
+      "at": "2026-06-26 17:20",
+      "text": "订单已取消（未发货），款项原路退回",
       "type": "warn"
     }
   ],
@@ -42,12 +47,10 @@
   "refund_deadline": null,
   "refund_note": "",
   "available_actions": [
-    "cancel_order",
-    "pay_reminder"
+    "reorder"
   ],
   "available_action_labels": [
-    "取消订单",
-    "获取支付链接"
+    "再次购买"
   ],
-  "internal_note": ""
+  "internal_note": "用户主动取消，未发货"
 }

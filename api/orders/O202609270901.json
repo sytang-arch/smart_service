@@ -1,9 +1,9 @@
 {
-  "order_id": "O202609230901",
+  "order_id": "O202609270901",
   "customer_id": "C1001",
   "status": "pending_payment",
   "status_label": "待付款",
-  "created_at": "2026-09-23 10:07",
+  "created_at": "2026-09-27 10:07",
   "paid_at": null,
   "shipped_at": null,
   "signed_at": null,
@@ -27,12 +27,12 @@
   "address": "上海市浦东新区张江路 88 号 3 号楼 502",
   "timeline": [
     {
-      "at": "2026-09-23 10:07",
+      "at": "2026-09-27 10:07",
       "text": "订单创建，等待付款",
       "type": "order"
     },
     {
-      "at": "2026-09-23 12:07",
+      "at": "2026-09-27 12:07",
       "text": "已发送付款提醒，24 小时内未付款将自动关闭订单",
       "type": "warn"
     }
