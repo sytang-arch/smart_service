@@ -5,7 +5,6 @@
   "use strict";
 
   var S = window.CSStore;
-  var cfg = window.CS_CONFIG || {};
 
   function $(id) { return document.getElementById(id); }
 
@@ -295,23 +294,6 @@
     window.CSChat.setIdentity(S.currentCustomer(), fresh);
   }
 
-  /* ---------------- 接口面板 ---------------- */
-  function renderEndpoints() {
-    var base = (cfg.SITE_BASE || "").replace(/\/+$/, "");
-    var me = S.currentCustomerId;
-    var rows = [
-      ["ep-orders", base + "/api/orders/by-customer/" + me + ".json", "GET 该客户全部订单"],
-      ["ep-customer", base + "/api/customers/" + me + ".json", "GET 客户档案与会员权益"],
-      ["ep-kb", base + "/api/kb.json", "GET 客服政策知识库"],
-    ];
-    rows.forEach(function (r) {
-      var a = $(r[0]);
-      a.href = r[1];
-      a.textContent = r[1].replace(base, "");
-      a.title = r[2] + " —— " + r[1];
-    });
-  }
-
   /* ---------------- 顶栏 ---------------- */
   function bindChrome() {
     $("btn-reset").addEventListener("click", function () {
@@ -319,17 +301,22 @@
     });
   }
 
+  /* ---------------- 供对话模块回调 ----------------
+     对话里执行完状态变更（取消 / 退款 / 换货 / 维修）后必须让工作台重绘，
+     否则会出现「AI 说已取消、左侧列表纹丝不动」的不一致。 */
+  window.CSApp = {
+    refresh: function () {
+      renderOrders();
+      renderDetail();
+      window.CSChat.setIdentity(S.currentCustomer(), S.selectedOrderId ? S.getOrder(S.selectedOrderId) : null);
+    },
+  };
+
   /* ---------------- 启动 ---------------- */
   function boot() {
     bindChrome();
     setupMobile();
     S.load().then(function () {
-      var pill = $("data-source-pill");
-      pill.textContent = S.source === "api"
-        ? "静态 API 已加载（api/*.json）"
-        : "本地数据包已加载（data.bundle.js 兜底）";
-      pill.className = "pill " + (S.source === "api" ? "pill-ok" : "pill-warn");
-
       // 数据是静态的，加载时会把日期顺延到今天（见 store.js 的 rebase 段）。
       // 顺延量>0 时在基准日后加一句说明 —— 这本身就是个可讲的设计点：
       // 分享出去的链接放几周也不会出现"预计送达已经过去"的自相矛盾。
@@ -339,7 +326,6 @@
       renderIdentity();
       renderOrders();
       renderDetail();
-      renderEndpoints();
       scheduleMetrics();   // 数据渲染完成后重算一次高度
 
       return window.CSChat.init().then(function () {

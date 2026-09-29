@@ -147,17 +147,6 @@ code { font-family: var(--mono); font-size: .92em; background: var(--info-soft);
 .id-item .id-l span { font-size: 11.5px; color: var(--text-3); }
 .id-item .id-r { margin-left: auto; font-size: 11px; color: var(--text-3); flex: none; }
 
-.endpoint-box { padding: 0 16px 16px; }
-.endpoint-title { font-size: 11.5px; color: var(--text-3); margin-bottom: 7px; }
-.endpoint {
-  display: block; font-family: var(--mono); font-size: 11px; color: var(--brand);
-  background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px;
-  padding: 5px 8px; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.endpoint:hover { background: var(--brand-soft); text-decoration: none; }
-.endpoint-note { font-size: 11.5px; color: var(--text-3); margin: 8px 0 0; }
-
 /* ---------------- 中栏：订单 ---------------- */
 .order-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; max-height: 460px; overflow: auto; }
 .order-item {
@@ -296,26 +285,6 @@ code { font-family: var(--mono); font-size: .92em; background: var(--info-soft);
 }
 .chat-foot .sep { opacity: .5; }
 
-/* ---------------- 对话通道切换（工作台对话 / Dify 原生对话） ---------------- */
-.chat-tabs { display: flex; gap: 6px; padding: 10px 14px 0; }
-/* 注意：`.chat-tabs { display: flex }` 会盖掉浏览器对 [hidden] 的默认 display:none，
-   未配置 Dify WebApp 地址时这个标签必须真的不显示（否则点了没反应）。 */
-.chat-tabs[hidden] { display: none; }
-.chat-tab {
-  font: inherit; font-size: 12px; padding: 5px 12px; cursor: pointer;
-  border: 1px solid var(--line-strong); background: var(--panel); color: var(--text-2);
-  border-radius: 999px; transition: .14s;
-}
-.chat-tab:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-soft); }
-.chat-tab.is-on { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; }
-
-.chat-embed { flex: 1; min-height: 300px; display: flex; flex-direction: column; }
-.chat-embed .embed-note {
-  margin: 0; padding: 9px 14px; font-size: 11.5px; line-height: 1.62;
-  color: var(--text-2); background: var(--warn-soft); border-bottom: 1px solid #f0e0c0;
-}
-.chat-embed iframe { flex: 1; width: 100%; min-height: 260px; border: none; background: var(--panel-2); }
-.chat-embed[hidden] { display: none; }
 .chat-body[hidden], .chat-quick[hidden], .chat-input[hidden] { display: none; }
 
 /* ---------------- 页脚 ---------------- */
@@ -392,13 +361,11 @@ code { font-family: var(--mono); font-size: .92em; background: var(--info-soft);
   .brand-text span { display: none; }
   .topbar-right { gap: 6px; }
   .topbar-right .btn { padding: 9px 11px; font-size: 12.5px; }
-  #data-source-pill { display: none; }
 
   /* ---- 触摸目标放大到 ≥44px ---- */
   .btn { padding: 10px 14px; font-size: 13.5px; }
   .btn-sm { padding: 10px 13px; font-size: 13px; }
   .chip { padding: 8px 13px; font-size: 12.5px; }
-  .chat-tab { padding: 9px 15px; font-size: 12.5px; }
   .id-item { padding: 11px 12px; }
   .order-item { padding: 13px; }
   .actions { gap: 8px; }

@@ -18,7 +18,6 @@
     </div>
   </div>
   <div class="topbar-right">
-    <span class="pill pill-ok" id="data-source-pill">数据加载中…</span>
     <button class="btn btn-ghost" id="btn-reset">重置演示数据</button>
   </div>
 </header>
@@ -34,14 +33,6 @@
     <div class="identity-current" id="identity-current"></div>
     <div class="col-sub">切换客户（点击即切换身份）</div>
     <div class="identity-list" id="identity-list"></div>
-    <div class="col-sub">数据接口（供 Dify 调用）</div>
-    <div class="endpoint-box">
-      <div class="endpoint-title">静态只读 API · 同一份数据，前端与 Agent 共用</div>
-      <a class="endpoint" id="ep-orders" target="_blank" rel="noopener"></a>
-      <a class="endpoint" id="ep-customer" target="_blank" rel="noopener"></a>
-      <a class="endpoint" id="ep-kb" target="_blank" rel="noopener"></a>
-      <p class="endpoint-note">GitHub Pages 直接托管 <code>api/</code> 目录，Dify 自定义工具按 OpenAPI 定义调用；Dify 服务器访问 GitHub 无网络限制。</p>
-    </div>
   </aside>
 
   <!-- 中：订单 -->
@@ -61,24 +52,11 @@
   <section class="col col-chat">
     <div class="col-head">
       <h2>AI 客服</h2>
-      <span class="hint" id="chat-mode-hint">Dify Agent</span>
-    </div>
-
-    <div class="chat-tabs" id="chat-tabs" hidden>
-      <button type="button" class="chat-tab is-on" data-channel="chat">工作台对话</button>
-      <button type="button" class="chat-tab" data-channel="embed">Dify 原生对话</button>
     </div>
 
     <div class="chat-context" id="chat-context"></div>
 
     <div class="chat-body" id="chat-body"></div>
-
-    <div class="chat-embed" id="chat-embed" hidden>
-      <p class="embed-note" id="embed-note"></p>
-      <iframe id="chat-embed-frame" title="Dify Agent 原生对话"
-              allow="microphone; clipboard-write; fullscreen"
-              referrerpolicy="strict-origin-when-cross-origin"></iframe>
-    </div>
 
     <div class="chat-quick" id="chat-quick"></div>
 
@@ -119,7 +97,7 @@
 </nav>
 
 <footer class="footer">
-  演示数据，非真实订单与客户信息 · 数据基准日 <span id="asof"></span> · 前端静态托管于 GitHub Pages，对话经轻量代理转发至 Dify
+  演示数据，非真实订单与客户信息 · 数据基准日 <span id="asof"></span> · 前端静态托管于 GitHub Pages，对话由浏览器直连 Dify Agent
 </footer>
 
 <script src="assets/js/data.bundle.js"></script>
