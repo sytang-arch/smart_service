@@ -92,9 +92,13 @@ code { font-family: var(--mono); font-size: .92em; background: var(--info-soft);
 .btn-ok:hover { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
 
 /* ---------------- 三栏布局 ---------------- */
+/* 主次：AI 对话是主角（1.4 份），订单列表只占 1 份，左栏身份固定宽。
+   整页限宽 1600px 并居中，避免超宽屏下对话区被拉成一条过长的带子。
+   窄到 1180px 以下切两栏（见下方媒体查询），≤900px 走移动端单面板。 */
 .layout {
   display: grid; gap: 16px; padding: 16px 20px;
-  grid-template-columns: 268px minmax(0, 1fr) 392px;
+  max-width: 1600px; margin: 0 auto;
+  grid-template-columns: 260px minmax(0, 1fr) minmax(0, 1.4fr);
   align-items: start;
 }
 .col {
