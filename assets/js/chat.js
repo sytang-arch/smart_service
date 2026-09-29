@@ -1,9 +1,12 @@
 /* ==========================================================================
    AI 客服对话模块
    --------------------------------------------------------------------------
-   主通道：自建聊天 UI → 代理 → Dify Agent（Agent 通过静态 API 查订单）
-   兜底  ：未配置代理地址时进入"规则兜底模式"，用前端规则回答常见问题，
+   通道 1：自建聊天 UI → 自建代理 → Dify Agent（API Key 只在代理里）
+   通道 2：自建聊天 UI → Dify 官方 Web 接口直连（零后端，浏览器自己等结果）
+   通道 3：Dify 官方 WebApp iframe 内嵌（集成方式对照）
+   兜底  ：都不通时进入"规则兜底模式"，用前端规则回答常见问题，
            保证页面被分享出去后点开永远有反应（会明确标注当前模式）。
+   自动选择顺序：自建代理 → 官方 Web 接口直连 → 规则兜底。
    ========================================================================== */
 (function () {
   "use strict";
@@ -13,12 +16,14 @@
   var el = {};
   var state = {
     mode: "unknown",            // "dify" | "offline"
+    transport: "",              // "proxy"（自建代理）| "webapp"（Dify 官方 Web 接口直连）
     channel: "chat",            // "chat"（自建 UI，身份自动注入）| "embed"（Dify 官方 WebApp iframe）
     base: "",                   // 代理基地址（"" = 同源）
     conversationId: "",
     sending: false,
     customer: null,
     order: null,
+    webapp: null,               // { api, code, sid, passport }
   };
 
   /** 代理基地址：配置了用配置的，没配就用同源（页面本身由代理托管时即为此情况） */
@@ -123,7 +128,10 @@
 
   /** 把探测到的通道状态写回界面（切回工作台对话时复用） */
   function applyModeHint() {
-    if (state.mode === "dify") {
+    if (state.mode === "dify" && state.transport === "webapp") {
+      setStatus("Dify Agent 已连接（浏览器直连官方 Web 接口）", "ok");
+      if (el.modeHint) el.modeHint.textContent = "Dify Agent · 官方 Web 接口直连（零后端）";
+    } else if (state.mode === "dify") {
       setStatus("Dify Agent 已连接", "ok");
       if (el.modeHint) el.modeHint.textContent = "Dify Agent" + (state.appName ? " · " + state.appName : "");
     } else if (state.difyConfigured === true) {
@@ -194,16 +202,17 @@
     el.text.style.height = "auto";
 
     var typing = addTyping();
-    var route = state.mode === "dify" ? callDify : callOffline;
+    var route = state.mode !== "dify" ? callOffline : (state.transport === "webapp" ? callWebApp : callDify);
 
     route(text.trim())
       .then(function (r) {
         removeTyping();
-        addMsg("ai", r.answer, r.meta);
+        /* 流式通道已经在气泡里逐字渲染完了，resolve 出来的是 null，不能再 addMsg 一次 */
+        if (r) addMsg("ai", r.answer, r.meta);
       })
       .catch(function (err) {
         removeTyping();
-        addMsg("ai", "抱歉，对话服务暂时不可用：" + err.message + "\n\n可以稍后重试，或在 `assets/js/config.js` 里检查 `API_BASE` 是否填对。", "错误");
+        addMsg("ai", "抱歉，对话服务暂时不可用：" + err.message + "\n\n可以稍后重试；若持续失败，检查 `assets/js/config.js` 里的 `DIFY_WEBAPP_URL` / `API_BASE` 是否填对。", "错误");
       })
       .then(function () {
         state.sending = false;
@@ -214,7 +223,55 @@
       });
   }
 
-  /* ---------------- 通道 A：Dify ---------------- */
+  /* ---------------- Dify 官方 Web 接口（浏览器直连，零后端） ----------------
+     依据 Dify 官方给「嵌入式 Web 应用」提供的 Web API（api/openapi/markdown/
+     web-openapi.md，以及官方 WebApp 前端自身的实现），流程就两步：
+       1) GET  {origin}/api/passport?user_id=<会话ID>    头：X-App-Code
+          → 换一枚匿名 access_token（share code 本身是公开的）
+       2) POST {origin}/api/chat-messages
+          头：X-App-Code + X-App-Passport（就是刚换到的 token）
+          → 事件格式与 Service API 完全一致（SSE / blocking），同样支持 inputs
+     用它当线上主通道的理由：等结果这件事由浏览器自己承担，不经过任何后端，
+     所以不受云函数超时（腾讯云免费版固定 3 秒）之类的限制。
+     ---------------------------------------------------------------------- */
+  function webappConfig() {
+    var url = String(cfg.DIFY_WEBAPP_URL || "").trim();
+    if (!url) return null;
+    var m = /^(https?:\/\/[^/]+)\/(?:chat|chatbot)\/([^/?#]+)/i.exec(url);
+    if (!m) return null;
+    return { api: m[1] + "/api", code: m[2] };
+  }
+
+  /** 匿名会话 ID：换票据时要用，同一浏览器保持一致才能延续同一段会话 */
+  function webAppSessionId() {
+    var k = "cs-webapp-sid", v = "";
+    try { v = localStorage.getItem(k) || ""; } catch (e) { v = ""; }
+    if (!v) {
+      v = "web-" + Math.random().toString(36).slice(2, 10) + "-" + Date.now().toString(36);
+      try { localStorage.setItem(k, v); } catch (e) { /* 隐私模式：退化成每次新建，功能不受影响 */ }
+    }
+    return v;
+  }
+
+  /** 换票据（缓存复用；force=true 用于票据失效后重换） */
+  function ensurePassport(force) {
+    var wa = state.webapp;
+    if (!wa) return Promise.reject(new Error("未配置 DIFY_WEBAPP_URL"));
+    if (wa.passport && !force) return Promise.resolve(wa.passport);
+    return fetch(wa.api + "/passport?user_id=" + encodeURIComponent(wa.sid), {
+      headers: { "X-App-Code": wa.code },
+      cache: "no-store",
+    }).then(function (r) {
+      if (!r.ok) throw new Error("换票据失败 HTTP " + r.status);
+      return r.json();
+    }).then(function (j) {
+      if (!j || !j.access_token) throw new Error("票据响应里没有 access_token");
+      wa.passport = j.access_token;
+      return wa.passport;
+    });
+  }
+
+  /* ---------------- 通道 A：自建代理 ---------------- */
   function callDify(query) {
     var payload = {
       query: query,
@@ -237,51 +294,115 @@
       if (ct.indexOf("text/event-stream") === -1 || !resp.body) {
         return resp.json().then(function (j) {
           if (j.conversation_id) state.conversationId = j.conversation_id;
-          return { answer: j.answer || "(空回复)", meta: "Dify Agent" };
+          return { answer: j.answer || "(空回复)", meta: "Dify Agent（代理）" };
         });
       }
-      // SSE 流式
-      var bub = addMsg("ai", "");
-      var reader = resp.body.getReader();
-      var dec = new TextDecoder("utf-8");
-      var buf = "", acc = "", cid = "";
-      return new Promise(function (resolve, reject) {
-        function pump() {
-          reader.read().then(function (r) {
-            if (r.done) {
-              removeTyping();
-              if (acc) bub.innerHTML = md(acc) + '<div class="msg-meta">Dify Agent</div>';
-              resolve(null);
-              return;
-            }
-            buf += dec.decode(r.value, { stream: true });
-            var parts = buf.split("\n\n");
-            buf = parts.pop();
-            parts.forEach(function (block) {
-              block.split("\n").forEach(function (line) {
-                if (line.indexOf("data:") !== 0) return;
-                var raw = line.slice(5).trim();
-                if (!raw || raw === "[DONE]") return;
-                var ev;
-                try { ev = JSON.parse(raw); } catch (e) { return; }
-                if (ev.conversation_id) cid = ev.conversation_id;
-                if (ev.event === "message" || ev.event === "agent_message") {
-                  acc += ev.answer || "";
-                  removeTyping();
-                  bub.innerHTML = md(acc) + '<div class="msg-meta">Dify Agent</div>';
-                  el.body.scrollTop = el.body.scrollHeight;
-                } else if (ev.event === "error") {
-                  acc += "\n\n[Agent 报错：" + (ev.message || ev.code) + "]";
-                  bub.innerHTML = md(acc);
-                }
-              });
-            });
-            pump();
-          }).catch(reject);
-        }
-        pump();
-      }).then(function () { if (cid) state.conversationId = cid; });
+      return streamSSE(resp, "Dify Agent（代理）");
     });
+  }
+
+  /* ---------------- 通道 A2：Dify 官方 Web 接口直连 ---------------- */
+  function callWebApp(query) {
+    var wa = state.webapp;
+    var payload = {
+      inputs: {
+        customer_id: state.customer ? state.customer.customer_id : "",
+        customer_name: state.customer ? state.customer.name : "",
+        order_id: state.order ? state.order.order_id : "",
+      },
+      query: query,
+      response_mode: "streaming",
+      conversation_id: state.conversationId || "",
+      user: wa.sid,
+    };
+
+    function attempt(force) {
+      return ensurePassport(force).then(function (tok) {
+        return fetch(wa.api + "/chat-messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-App-Code": wa.code,
+            "X-App-Passport": tok,
+          },
+          body: JSON.stringify(payload),
+        });
+      });
+    }
+
+    return attempt(false)
+      .then(function (resp) {
+        if (resp.status === 401) {
+          /* 票据可能过期：清掉缓存重换一次再试 */
+          wa.passport = "";
+          return attempt(true);
+        }
+        return resp;
+      })
+      .then(function (resp) {
+        if (!resp.ok) {
+          return resp.text().then(function (t) {
+            throw new Error("Dify Web 接口返回 HTTP " + resp.status + " " + String(t).slice(0, 160));
+          });
+        }
+        var ct = resp.headers.get("content-type") || "";
+        if (ct.indexOf("text/event-stream") === -1 || !resp.body) {
+          return resp.json().then(function (j) {
+            if (j.conversation_id) state.conversationId = j.conversation_id;
+            return { answer: j.answer || "(空回复)", meta: "Dify Agent · 官方 Web 接口" };
+          });
+        }
+        return streamSSE(resp, "Dify Agent · 官方 Web 接口");
+      });
+  }
+
+  /** 把 Dify 返回的 SSE 流逐字渲染进气泡（代理通道与直连通道共用同一份解析） */
+  function streamSSE(resp, meta) {
+    var bub = addMsg("ai", "");
+    var reader = resp.body.getReader();
+    var dec = new TextDecoder("utf-8");
+    var buf = "", acc = "", cid = "";
+
+    function paint() {
+      bub.innerHTML = md(acc) + '<div class="msg-meta">' + esc(meta) + "</div>";
+      el.body.scrollTop = el.body.scrollHeight;
+    }
+
+    return new Promise(function (resolve, reject) {
+      function pump() {
+        reader.read().then(function (r) {
+          if (r.done) {
+            removeTyping();
+            if (acc) paint();
+            resolve(null);
+            return;
+          }
+          buf += dec.decode(r.value, { stream: true });
+          var parts = buf.split("\n\n");
+          buf = parts.pop();
+          parts.forEach(function (block) {
+            block.split("\n").forEach(function (line) {
+              if (line.indexOf("data:") !== 0) return;
+              var raw = line.slice(5).trim();
+              if (!raw || raw === "[DONE]") return;
+              var ev;
+              try { ev = JSON.parse(raw); } catch (e) { return; }
+              if (ev.conversation_id) cid = ev.conversation_id;
+              if (ev.event === "message" || ev.event === "agent_message") {
+                acc += ev.answer || "";
+                removeTyping();
+                paint();
+              } else if (ev.event === "error") {
+                acc += "\n\n[Agent 报错：" + (ev.message || ev.code) + "]";
+                paint();
+              }
+            });
+          });
+          pump();
+        }).catch(reject);
+      }
+      pump();
+    }).then(function () { if (cid) state.conversationId = cid; return null; });
   }
 
   /* ---------------- 通道 B：规则兜底 ---------------- */
@@ -529,6 +650,7 @@
           state.base = base;
           state.appName = (j && j.app_name) || "";
           state.difyConfigured = !!(j && j.dify_configured);
+          state.transport = "proxy";
           state.mode = state.difyConfigured ? "dify" : "offline";
           if (state.channel === "chat") applyModeHint();
           return true;
@@ -536,12 +658,34 @@
         .catch(function () { return next(); });
     }
 
-    return next().then(function (ok) {
-      if (ok) return;
-      state.mode = "offline";
-      state.difyConfigured = false;
-      if (state.channel === "chat") applyModeHint();
-    });
+    /* 没有代理时退到第二条通道：Dify 官方 Web 接口直连。
+       拿「能不能换到票据」当健康检查 —— 票据换得到，消息就一定发得出去。 */
+    function tryWebApp() {
+      var wa = webappConfig();
+      if (!wa) return Promise.resolve(false);
+      state.webapp = { api: wa.api, code: wa.code, sid: webAppSessionId(), passport: "" };
+      return ensurePassport(false)
+        .then(function () {
+          state.transport = "webapp";
+          state.mode = "dify";
+          state.difyConfigured = true;
+          if (state.channel === "chat") applyModeHint();
+          return true;
+        })
+        .catch(function () {
+          state.webapp = null;
+          return false;
+        });
+    }
+
+    return next()
+      .then(function (ok) { return ok ? true : tryWebApp(); })
+      .then(function (ok) {
+        if (ok) return;
+        state.mode = "offline";
+        state.difyConfigured = false;
+        if (state.channel === "chat") applyModeHint();
+      });
   }
 
   /* ---------------- 初始化 ---------------- */
@@ -594,18 +738,13 @@
     setupChannels();
 
     return detectMode().then(function () {
-      /* 公开托管（GitHub Pages）且没有配代理时，自建通道只能走规则兜底。
-         这时候如果填了 Dify WebApp 地址，就默认切到官方 iframe，
-         让访问者第一眼看到的是真 Agent，而不是规则问答。 */
-      if (state.mode !== "dify" && cfg.DIFY_WEBAPP_URL) {
-        setChannel("embed");
-        addMsg(
-          "ai",
-          "当前页面没有配置对话代理，已自动切到 **Dify 原生对话** 通道（上方标签可随时切回「工作台对话」）。\n\n" +
-          "· 工作台对话：身份由服务端注入，Agent 自动知道当前客户是谁。\n" +
-          "· 原生对话：iframe 拿不到登录状态，需要您手动告诉 Agent 自己是谁。",
-          "通道自动选择"
-        );
+      /* 不再自动跳到 iframe 通道：直连通道已经能让自建 UI 用上真 Agent，
+         而 iframe 依赖同一套网络，自动切过去只会把主界面藏起来、还帮不上忙。
+         想对照两种集成方式，点上方「原生对话」标签即可。 */
+      if (state.mode === "offline" && cfg.DIFY_WEBAPP_URL) {
+        addMsg("ai",
+          "暂时没能连上 Dify，已回落到规则兜底模式；也可以点上方「原生对话」，用官方界面再试一次。",
+          "模式提示");
       }
     });
   }
@@ -643,5 +782,7 @@
     /** 暴露给自动化测试与调试用，正常流程不会调用 */
     _offlineAnswer: offlineAnswer,
     _extractOrderId: extractOrderId,
+    _webappConfig: webappConfig,
+    _state: state,
   };
 })();

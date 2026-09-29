@@ -16,29 +16,46 @@ window.CS_CONFIG = {
   SITE_BASE: "https://sytang-arch.github.io/smart_service",
 
   /* ----------------------------------------------------------------------
-     2) Dify 对话代理地址（自建聊天 UI 走这里，不直连 Dify）
-     为什么不直连：Dify 的 API Key 一旦写进前端 JS，任何人 F12 就能抄走。
-     所以由代理持有 Key，浏览器只跟代理说话。
+     2) 自建对话代理地址（可选）
+     页面的「工作台对话」有两个通道，自动选：
+       · 配了本项     → 走自建代理（本地 node server/index.js / Cloudflare
+                        Worker …）。Dify 的 API Key 只存在代理里。
+       · 没配本项     → 走第 3 项的「Dify 官方 Web 接口直连」，零后端。
 
-     三种填法：
-       · 本地跑代理：      "http://localhost:8787"
+     为什么不直接调 Dify 的 /v1/chat-messages：那条路要带 Service API Key
+     （app-xxxx），一旦写进前端 JS，任何人 F12 就能抄走，所以只能由代理持有。
+
+     ⚠️ 别用腾讯云 CloudBase 免费版云函数当代理：官方套餐配额表写着
+        云函数「超时时间 3s、不支持修改」，而 Dify 一次回答常要 10~30 秒，
+        必然超时（标准版起才允许改）。要用自建代理就选 Cloudflare Worker，
+        代码见 server/worker.js。
+
+     填法示例：
+       · 本地跑代理：             "http://localhost:8787"
        · 部署 Cloudflare Worker： "https://<你的-worker>.workers.dev"
-         （代码见 server/worker.js）
-       · 部署到腾讯云 CloudBase 云函数： "https://<环境ID>.service.tcloudbase.com/proxy"
-         （代码见 server/cloudbase.js；国内直连、免备案，面试官在国内时用这个）
-     留空 = 页面进入"规则兜底模式"（不连 Dify，用前端规则回答常见问题，
-     保证分享出去的链接点开永远有反应，而不是一个死掉的对话框）。
+     留空 = 自动落到第 3 项；第 3 项也没填，才进"规则兜底模式"。
      ---------------------------------------------------------------------- */
   API_BASE: "",
 
   /* ----------------------------------------------------------------------
-     3) Dify 应用 WebApp 地址（可选，作为备用通道）
-     在 Dify 应用页「访问 API」或「概览」里能拿到，形如
-       https://udify.app/chatbot/xxxxxxxx
-     填了它，页面会多一个「嵌入式对话」入口，一键在页面内打开官方对话窗口。
-     完全不填也不影响主流程。
+     3) Dify 应用 WebApp 地址（★ 线上主通道，建议填 ★）
+     在 Dify 应用页「概览 / 访问 API」里复制 WebApp 链接，形如
+       https://udify.app/chat/945swIXXjpSGzVj2
+
+     填了它，页面会做两件事：
+       · 用末段的 share code 走 Dify 官方给「嵌入式 Web 应用」提供的 Web 接口
+         直连对话（先换匿名票据，再带上它请求）。浏览器自己等结果，
+         不经过任何后端 —— 也就不存在云函数超时之类的限制；
+         身份照旧通过 inputs 注入，Agent 不会认错人。
+       · 上方出现「原生对话」标签，用 iframe 内嵌同一个官方界面，做集成方式对照。
+
+     两件事要说清楚：
+       ① share code 是公开的 —— 它本来就印在分享链接里，谁点开都能看到；
+          而 Dify 的 API Key（app-xxxx）任何时候都不进前端。两者不是一回事。
+       ② 因为是公开链接，理论上任何人都能调用这个 Agent 并消耗你的额度。
+          这正是"分享应用"的代价；不想被白用就把 WebApp 关掉、只留本地代理。
      ---------------------------------------------------------------------- */
-  DIFY_WEBAPP_URL: "",
+  DIFY_WEBAPP_URL: "https://udify.app/chat/945swIXXjpSGzVj2",
 
   /* ----------------------------------------------------------------------
      以下为展示用文案，按需改
